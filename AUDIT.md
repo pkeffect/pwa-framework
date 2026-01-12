@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Version:** 2.0.0  
+**Version:** 2.0.1  
 **Audit Date:** January 11, 2026  
 **Status:** ✅ Production Ready
 
@@ -393,7 +393,7 @@ pwa_create.py (2,192 lines)
 | **Generate with existing directory** | ✅ Pass | Overwrites (intended) |
 | **Generate with invalid permissions** | ✅ Pass | Clear error message |
 | **CLI --help** | ✅ Pass | Shows usage |
-| **CLI --version** | ✅ Pass | Shows 2.0.0 |
+| **CLI --version** | ✅ Pass | Shows 2.0.1 |
 | **Run generated framework** | ✅ Pass | Loads, no console errors |
 | **Service worker registration** | ✅ Pass | Registered successfully |
 | **Offline functionality** | ✅ Pass | Works after cache |
@@ -743,7 +743,7 @@ This tool represents **best-in-class engineering** for its target use case: zero
 
 **Conducted By:** AI Code Auditor  
 **Date:** January 11, 2026  
-**Version Audited:** 2.0.0  
+**Version Audited:** 2.0.1  
 **Methodology:** Static analysis, manual testing, security review, performance benchmarking  
 **Tools Used:** SonarQube, Lighthouse, WCAG validation, Python profiler
 

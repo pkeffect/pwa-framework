@@ -8,9 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned
-- GitHub Actions CI/CD workflows
 - Automated release system
 - Release drafter for auto-generated changelogs
+
+## [2.0.1] - 2026-01-11
+
+### Fixed
+- **CI/CD Compatibility**: Added `sys.stdin.isatty()` check to prevent interactive prompts in non-interactive environments (GitHub Actions, piped input)
+- **Exit Codes**: User cancellation (Ctrl+C/EOF) now exits with code 1 instead of 0
+- **Code Quality**: Removed all trailing whitespace from source files
+- **Error Messages**: Improved error message clarity for non-interactive mode ("Project name is required (non-interactive mode)")
+
+### Changed
+- GitHub Actions CI/CD workflow now fully operational with matrix testing (3 OS × 3 Python versions)
 
 ## [2.0.0] - 2026-01-11
 
@@ -135,6 +145,7 @@ When adding features:
 
 ---
 
-[Unreleased]: https://github.com/pkeffect/pwa-framework/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/pkeffect/pwa-framework/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/pkeffect/pwa-framework/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/pkeffect/pwa-framework/releases/tag/v2.0.0
 [1.0.0]: https://github.com/pkeffect/pwa-framework/releases/tag/v1.0.0

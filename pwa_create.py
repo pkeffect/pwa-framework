@@ -10,7 +10,7 @@ Usage:
     python pwa_create.py --help
 
 Author: pkeffect
-Version: 2.0.0
+Version: 2.0.1
 License: Open Source
 """
 
@@ -23,7 +23,7 @@ from pathlib import Path
 # Constants
 MAX_PROJECT_NAME_LENGTH = 50
 MIN_PROJECT_NAME_LENGTH = 1
-SCRIPT_VERSION = "2.0.0"
+SCRIPT_VERSION = "2.0.1"
 
 # ==========================================
 # 1. FILE CONTENT TEMPLATES
@@ -85,7 +85,7 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-main);
-    width: 100vw; 
+    width: 100vw;
     height: 100vh; /* Fallback for older browsers */
     height: 100dvh; /* Progressive enhancement */
     overflow: hidden;
@@ -120,7 +120,7 @@ body {
 
 /* ORIENTATION ENFORCER */
 #rotate-overlay {
-    display: none; 
+    display: none;
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: #000; z-index: 9998;
     flex-direction: column; justify-content: center; align-items: center;
@@ -129,7 +129,7 @@ body {
 
 @media screen and (orientation: portrait) and (max-width: 768px) {
     /* Uncomment to force landscape */
-    /* #rotate-overlay { display: flex; } */ 
+    /* #rotate-overlay { display: flex; } */
 }
 """
 
@@ -268,7 +268,7 @@ input:checked + .slider:before { transform: translateX(20px); }
 
 .hud-bar {
     position: absolute; top: 0; left: 0; width: 100%;
-    padding: 20px; display: flex; justify-content: flex-end; 
+    padding: 20px; display: flex; justify-content: flex-end;
     pointer-events: none;
 }
 
@@ -308,17 +308,17 @@ input:checked + .slider:before { transform: translateX(20px); }
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self'; img-src 'self' data:; connect-src 'self';">
     <meta name="generator" content="PWA Framework Generator v{SCRIPT_VERSION}">
     <title>{project_name}</title>
-    
+
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" 
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" 
-          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" 
-          crossorigin="anonymous" 
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous"
           referrerpolicy="no-referrer">
-    
+
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/ui.css">
 </head>
@@ -341,19 +341,19 @@ input:checked + .slider:before { transform: translateX(20px); }
 
     <!-- UI Overlay -->
     <div id="ui-layer">
-        
+
         <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
-        
+
         <!-- Main Menu -->
         <div id="menu-scene" class="menu-card glass-panel hidden" role="navigation" aria-label="Main Menu">
             <h1 class="menu-title">{project_name}</h1>
-            
+
             <button id="btn-start" class="btn" aria-label="Start game">Start</button>
             <button id="btn-highscores" class="btn" aria-label="View high scores">High Scores</button>
             <button id="btn-settings-menu" class="btn" aria-label="Open settings">Settings</button>
             <button id="btn-about" class="btn" aria-label="About this game">About</button>
             <button id="btn-help" class="btn" aria-label="View help and controls">Help</button>
-            
+
             <div id="version-display" style="margin-top:20px; font-size:0.7rem; color:#666;">
                 v<span style="color:var(--accent-color)">1.0.0</span>
             </div>
@@ -419,7 +419,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 <h2>Settings</h2>
                 <button id="btn-sidebar-close" style="background:none; border:none; color:#666; font-size:1.5rem; cursor:pointer;" aria-label="Close settings">&times;</button>
             </div>
-            
+
             <div class="setting-row">
                 <span>Sidebar Side</span>
                 <select id="sel-sidebar-side">
@@ -428,7 +428,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                 </select>
             </div>
             <hr style="border:0; border-top:1px solid #333; margin: 5px 0;">
-            
+
             <div class="setting-row">
                 <span>Sound On/Off</span>
                 <label class="toggle-switch">
@@ -436,7 +436,7 @@ input:checked + .slider:before { transform: translateX(20px); }
                     <span class="slider"></span>
                 </label>
             </div>
-            
+
             <div class="setting-row">
                 <span>Master Volume</span>
                 <input type="range" id="rng-volume" min="0" max="1" step="0.1" value="1">
@@ -484,7 +484,7 @@ async function initApp() {
         console.log('📦 Assets Loaded');
 
         SceneManager.init();
-        
+
         const loader = document.getElementById('loading-layer');
         loader.classList.add('fade-out');
         setTimeout(() => loader.remove(), 500);
@@ -515,22 +515,22 @@ window.addEventListener('DOMContentLoaded', initApp);
 
     static async load(manifest, onProgress = null) {
         if (manifest.length === 0) return;
-        
+
         const CHUNK_SIZE = 5; // Limit parallel requests to avoid overwhelming mobile
         let loaded = 0;
-        
+
         for(let i = 0; i < manifest.length; i += CHUNK_SIZE) {
             const chunk = manifest.slice(i, i + CHUNK_SIZE);
             await Promise.all(chunk.map(item => this.loadItem(item)));
             loaded += chunk.length;
             if(onProgress) onProgress(loaded / manifest.length);
         }
-        
+
         if(this.failedAssets.length > 0) {
             console.warn(`⚠️ ${this.failedAssets.length} assets failed to load:`, this.failedAssets);
         }
     }
-    
+
     static async loadItem(item, retries = 2) {
         for (let attempt = 0; attempt <= retries; attempt++) {
             try {
@@ -552,7 +552,7 @@ window.addEventListener('DOMContentLoaded', initApp);
             }
         }
     }
-    
+
     static async _loadItemOnce(item) {
         return new Promise((resolve, reject) => {
             if (item.type === 'image') {
@@ -570,19 +570,19 @@ window.addEventListener('DOMContentLoaded', initApp);
                     resolve(img);
                 };
                 img.onerror = () => reject(new Error(`Image load failed: ${item.src}`));
-            } 
+            }
             else if (item.type === 'audio') {
                 const audio = new Audio();
                 audio.src = item.src;
                 audio.oncanplaythrough = () => resolve(audio);
                 audio.onerror = () => reject(new Error(`Audio load failed: ${item.src}`));
             }
-            else { 
-                resolve(null); 
+            else {
+                resolve(null);
             }
         });
     }
-    
+
     static createPlaceholder() {
         // Create a 1x1 transparent placeholder image
         const canvas = document.createElement('canvas');
@@ -611,19 +611,19 @@ window.addEventListener('DOMContentLoaded', initApp);
         window.addEventListener('resize', () => this.resize());
         console.log('🎨 Renderer Initialized');
     }
-    
+
     static resize() {
         // High DPI Support (Retina)
         const dpr = window.devicePixelRatio || 1;
-        
+
         // 1. Set internal buffer size (High Res)
         this.canvas.width = window.innerWidth * dpr;
         this.canvas.height = window.innerHeight * dpr;
-        
+
         // 2. Set CSS size (Screen Size)
         this.canvas.style.width = `${window.innerWidth}px`;
         this.canvas.style.height = `${window.innerHeight}px`;
-        
+
         // Note: If using 2D context, you may need to ctx.scale(dpr, dpr) here
     }
 }"""
@@ -640,7 +640,7 @@ window.addEventListener('DOMContentLoaded', initApp);
         this.callback = callback;
         this.lastTime = 0;
         this.isRunning = true;
-        
+
         // Auto-pause when backgrounded to save battery
         const handleVisibilityChange = () => {
             const hidden = document.hidden || document.webkitHidden;
@@ -659,16 +659,16 @@ window.addEventListener('DOMContentLoaded', initApp);
 
         const loop = (time) => {
             if(!this.isRunning) return;
-            
+
             const dt = (time - this.lastTime) / 1000;
             this.lastTime = time;
-            
+
             if (dt < 0.1) {
                 this.callback(dt);
             } else {
                 console.warn(`⚠️ Frame took ${dt.toFixed(2)}s - skipping to prevent spiral of death`);
             }
-            
+
             requestAnimationFrame(loop);
         };
         requestAnimationFrame(loop);
@@ -696,13 +696,13 @@ window.addEventListener('DOMContentLoaded', initApp);
         return """export class AudioManager {
     static ctx = null;
 
-    static init() { 
+    static init() {
         // Lazy Initialize Audio Context
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         this.ctx = new AudioContext();
-        console.log('🔊 Audio Context Initialized'); 
+        console.log('🔊 Audio Context Initialized');
     }
-    
+
     static async resume() {
         // Unlock Audio on first user interaction
         if (!this.ctx) this.init();
@@ -759,7 +759,7 @@ export class Settings {
     static load() {
         const saved = SaveSystem.load('app_settings');
         if(saved) Store.settings = { ...Store.settings, ...saved };
-        
+
         UIManager.updateSettingsUI(Store.settings);
         UIManager.setSidebarSide(Store.settings.sidebarSide);
     }
@@ -835,14 +835,14 @@ import { AudioManager } from '../core/AudioManager.js';
 export class MenuScene {
     enter() {
         DOMUtils.show('menu-scene');
-        
+
         // 1. Start (Unlocks Audio)
         document.getElementById('btn-start').onclick = () => {
             AudioManager.resume().then(() => {
                 import('./SceneManager.js').then(m => m.SceneManager.loadScene('GAME'));
             });
         };
-        
+
         // 2. Navigation
         document.getElementById('btn-highscores').onclick = () => UIManager.openModal('modal-highscores');
         document.getElementById('btn-close-scores').onclick = () => UIManager.closeModal(document.getElementById('modal-highscores'));
@@ -895,11 +895,11 @@ export class GameScene {
 export class UIManager {
     static activeModal = null;
     static focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    
+
     static init() {
         this.sidebar = document.getElementById('settings-sidebar');
         this.backdrop = document.getElementById('sidebar-backdrop');
-        
+
         document.getElementById('btn-sidebar-toggle').onclick = () => this.openSidebar();
         document.getElementById('btn-sidebar-close').onclick = () => this.closeSidebar();
         this.backdrop.onclick = () => this.closeSidebar();
@@ -920,10 +920,10 @@ export class UIManager {
 
         // Keyboard navigation
         this.setupKeyboardNavigation();
-        
+
         Settings.load();
     }
-    
+
     static setupKeyboardNavigation() {
         document.addEventListener('keydown', (e) => {
             // ESC to close modals/sidebar
@@ -934,19 +934,19 @@ export class UIManager {
                     this.closeSidebar();
                 }
             }
-            
+
             // Tab trap for modals
             if (e.key === 'Tab' && this.activeModal) {
                 this.trapFocus(e, this.activeModal);
             }
         });
     }
-    
+
     static trapFocus(e, element) {
         const focusable = element.querySelectorAll(this.focusableElements);
         const firstFocusable = focusable[0];
         const lastFocusable = focusable[focusable.length - 1];
-        
+
         if (e.shiftKey) {
             if (document.activeElement === firstFocusable) {
                 lastFocusable.focus();
@@ -959,49 +959,49 @@ export class UIManager {
             }
         }
     }
-    
+
     static openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
-        
+
         modal.classList.remove('hidden');
         this.activeModal = modal;
-        
+
         // Focus first focusable element
         const focusable = modal.querySelectorAll(this.focusableElements);
         if (focusable.length > 0) focusable[0].focus();
     }
-    
+
     static closeModal(modal) {
         if (modal) {
             modal.classList.add('hidden');
             this.activeModal = null;
         }
     }
-    
+
     static updateSettingsUI(settings) {
-        if(document.getElementById('sel-sidebar-side')) 
+        if(document.getElementById('sel-sidebar-side'))
             document.getElementById('sel-sidebar-side').value = settings.sidebarSide;
-        if(document.getElementById('rng-volume')) 
+        if(document.getElementById('rng-volume'))
             document.getElementById('rng-volume').value = settings.volume;
-        if(document.getElementById('chk-sound')) 
+        if(document.getElementById('chk-sound'))
             document.getElementById('chk-sound').checked = settings.soundEnabled;
     }
-    
+
     static openSidebar() {
         this.sidebar.classList.add('active');
         this.backdrop.classList.add('active');
-        
+
         // Focus first element in sidebar
         const focusable = this.sidebar.querySelectorAll(this.focusableElements);
         if (focusable.length > 0) focusable[0].focus();
     }
-    
+
     static closeSidebar() {
         this.sidebar.classList.remove('active');
         this.backdrop.classList.remove('active');
     }
-    
+
     static setSidebarSide(side) {
         this.sidebar.classList.remove('left', 'right');
         this.sidebar.classList.add(side);
@@ -1061,14 +1061,14 @@ export class ErrorHandler {
             console.error('💥 Error:', e.error);
             ErrorDisplay.show(e.message);
         });
-        
+
         // Unhandled Promise Rejections
         window.addEventListener('unhandledrejection', (e) => {
             console.error('💥 Unhandled Promise Rejection:', e.reason);
             const message = e.reason?.message || String(e.reason);
             ErrorDisplay.show(`Async Error: ${message}`);
         });
-        
+
         // Resource loading failures (images, scripts, etc.)
         window.addEventListener('error', (e) => {
             if (e.target.tagName === 'IMG') {
@@ -1121,7 +1121,7 @@ async function limitCacheSize(cacheName) {{
     const cache = await caches.open(cacheName);
     const keys = await cache.keys();
     let totalSize = 0;
-    
+
     for (const key of keys) {{
         const response = await cache.match(key);
         if (response) {{
@@ -1129,7 +1129,7 @@ async function limitCacheSize(cacheName) {{
             totalSize += blob.size;
         }}
     }}
-    
+
     if (totalSize > MAX_CACHE_SIZE) {{
         console.warn(`[SW] Cache size (${{Math.round(totalSize/1024/1024)}}MB) exceeds limit. Clearing oldest entries.`);
         // Delete oldest entries (FIFO)
@@ -1454,7 +1454,7 @@ document.getElementById('btn-start').onclick = () => {{
 static openModal(modalId) {{
     const modal = document.getElementById(modalId);
     modal.classList.remove('hidden');
-    
+
     // Auto-focus first interactive element
     const focusable = modal.querySelectorAll('button, [href], input');
     if (focusable.length > 0) focusable[0].focus();
@@ -1526,15 +1526,15 @@ window.addEventListener('error', (e) => {{
 
 **Content Security Policy (CSP):**
 ```html
-<meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               script-src 'self'; 
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self';
+               script-src 'self';
                style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;">
 ```
 
 **Subresource Integrity (SRI):**
 ```html
-<link rel="stylesheet" 
+<link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
       crossorigin="anonymous">
@@ -1571,10 +1571,10 @@ import {{ AssetLoader }} from '../core/AssetLoader.js';
 export class GameScene {{
     enter() {{
         DOMUtils.show('game-hud');
-        
+
         this.canvas = Renderer.canvas;
         this.ctx = this.canvas.getContext('2d');
-        
+
         // Initialize game state
         this.player = {{
             x: this.canvas.width / 2,
@@ -1584,15 +1584,15 @@ export class GameScene {{
             speed: 300, // pixels per second
             img: AssetLoader.get('player')
         }};
-        
+
         this.score = 0;
-        
+
         // Input handling
         this.keys = {{}};
         window.addEventListener('keydown', e => this.keys[e.key] = true);
         window.addEventListener('keyup', e => this.keys[e.key] = false);
     }}
-    
+
     update(dt) {{
         // Movement (dt = delta time in seconds)
         if (this.keys['ArrowLeft'] || this.keys['a']) {{
@@ -1607,16 +1607,16 @@ export class GameScene {{
         if (this.keys['ArrowDown'] || this.keys['s']) {{
             this.player.y += this.player.speed * dt;
         }}
-        
+
         // Boundary checking
         this.player.x = Math.max(0, Math.min(this.canvas.width, this.player.x));
         this.player.y = Math.max(0, Math.min(this.canvas.height, this.player.y));
     }}
-    
+
     render() {{
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
+
         // Draw player
         if (this.player.img) {{
             this.ctx.drawImage(
@@ -1626,13 +1626,13 @@ export class GameScene {{
                 50, 50
             );
         }}
-        
+
         // Draw score
         this.ctx.fillStyle = '#ffffff';
         this.ctx.font = '24px Montserrat';
         this.ctx.fillText(`Score: ${{this.score}}`, 20, 40);
     }}
-    
+
     exit() {{
         DOMUtils.hide('game-hud');
         window.removeEventListener('keydown', this.keyDownHandler);
@@ -1728,7 +1728,7 @@ class ObjectPool {{
             this.pool.push({{ x:0, y:0, active:false }});
         }}
     }}
-    
+
     get() {{
         return this.pool.find(obj => !obj.active);
     }}
@@ -2010,17 +2010,17 @@ This framework is open source. Use it for any purpose - personal, educational, o
 
 ## 🙏 Credits
 
-**Framework:** Generated by PWA Game Framework Generator v2.0  
-**Author:** pkeffect  
-**Architecture:** Vanilla JavaScript ES6 Modules  
-**Styling:** Custom CSS with Glassmorphism effects  
+**Framework:** Generated by PWA Game Framework Generator v2.0
+**Author:** pkeffect
+**Architecture:** Vanilla JavaScript ES6 Modules
+**Styling:** Custom CSS with Glassmorphism effects
 
 ---
 
 ## 📞 Support
 
-**Issues?** Check the Troubleshooting section above.  
-**Questions?** Review the API Reference.  
+**Issues?** Check the Troubleshooting section above.
+**Questions?** Review the API Reference.
 **Feature Requests?** This is a minimalist framework - fork and extend!
 
 ---
@@ -2277,7 +2277,7 @@ def main() -> None:
 Examples:
   python pwa_create.py my-game
   python pwa_create.py "Space Shooter"
-  
+
 The project name will be sanitized (lowercased, spaces to hyphens).
 Only alphanumeric characters, hyphens, and underscores are allowed.
         """,
@@ -2306,6 +2306,12 @@ Only alphanumeric characters, hyphens, and underscores are allowed.
 
     # Interactive mode if no name provided
     if not project_name:
+        # Check if running in non-interactive environment (CI, piped input, etc.)
+        if not sys.stdin.isatty():
+            print("❌ Error: Project name is required (non-interactive mode)")
+            print("\nUsage: python pwa_create.py <project-name>")
+            sys.exit(1)
+
         print("\n" + "=" * 60)
         print("PWA Game Framework Generator")
         print("=" * 60)
@@ -2316,7 +2322,7 @@ Only alphanumeric characters, hyphens, and underscores are allowed.
             project_name = input("Enter project name: ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\n\n👋 Cancelled by user")
-            sys.exit(0)
+            sys.exit(1)  # Exit with error code when cancelled
 
     if not project_name:
         print("❌ Error: Project name is required")
