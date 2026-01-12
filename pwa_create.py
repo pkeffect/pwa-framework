@@ -25,8 +25,8 @@ from pathlib import Path
 if sys.platform == "win32":
     try:
         # Set console encoding to UTF-8 on Windows
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
+        sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+        sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
     except (AttributeError, OSError):
         # Fallback: just set environment variable
         os.environ["PYTHONIOENCODING"] = "utf-8"
@@ -486,7 +486,7 @@ const MANIFEST = [
 ];
 
 async function initApp() {
-    console.log('🚀 System Booting...');
+    console.log(' System Booting...');
 
     try {
         Renderer.init('game-canvas');
@@ -538,7 +538,7 @@ window.addEventListener('DOMContentLoaded', initApp);
         }
 
         if(this.failedAssets.length > 0) {
-            console.warn(`⚠️ ${this.failedAssets.length} assets failed to load:`, this.failedAssets);
+            console.warn(`[WARN] ${this.failedAssets.length} assets failed to load:`, this.failedAssets);
         }
     }
 
@@ -552,10 +552,10 @@ window.addEventListener('DOMContentLoaded', initApp);
                 if (attempt < retries) {
                     // Exponential backoff: 1s, 2s
                     const delay = 1000 * (attempt + 1);
-                    console.warn(`⚠️ Retry ${attempt + 1}/${retries} for ${item.src} after ${delay}ms`);
+                    console.warn(`[WARN] Retry ${attempt + 1}/${retries} for ${item.src} after ${delay}ms`);
                     await new Promise(r => setTimeout(r, delay));
                 } else {
-                    console.error(`❌ Failed to load after ${retries} retries: ${item.src}`);
+                    console.error(`ERROR: Failed to load after ${retries} retries: ${item.src}`);
                     this.failedAssets.push(item.src);
                     // Use placeholder
                     this.assets[item.key] = item.type === 'image' ? this.createPlaceholder() : null;
@@ -576,7 +576,7 @@ window.addEventListener('DOMContentLoaded', initApp);
                         return;
                     }
                     if (img.width > 8192 || img.height > 8192) {
-                        console.warn(`⚠️ Large image detected: ${img.width}x${img.height} - may impact performance`);
+                        console.warn(`[WARN] Large image detected: ${img.width}x${img.height} - may impact performance`);
                     }
                     resolve(img);
                 };
@@ -677,7 +677,7 @@ window.addEventListener('DOMContentLoaded', initApp);
             if (dt < 0.1) {
                 this.callback(dt);
             } else {
-                console.warn(`⚠️ Frame took ${dt.toFixed(2)}s - skipping to prevent spiral of death`);
+                console.warn(`[WARN] Frame took ${dt.toFixed(2)}s - skipping to prevent spiral of death`);
             }
 
             requestAnimationFrame(loop);
@@ -1083,11 +1083,11 @@ export class ErrorHandler {
         // Resource loading failures (images, scripts, etc.)
         window.addEventListener('error', (e) => {
             if (e.target.tagName === 'IMG') {
-                console.warn('⚠️ Image failed to load:', e.target.src);
+                console.warn('[WARN] Image failed to load:', e.target.src);
                 // Fallback to placeholder or empty image
                 e.target.style.display = 'none';
             } else if (e.target.tagName === 'SCRIPT') {
-                console.error('❌ Script failed to load:', e.target.src);
+                console.error('ERROR: Script failed to load:', e.target.src);
                 ErrorDisplay.show('Failed to load critical resource');
             }
         }, true); // Use capture phase
@@ -1259,7 +1259,7 @@ A **production-ready**, **zero-dependency** PWA Game Framework with enterprise-g
 
 ## ✨ Highlights
 
-- 🚀 **Zero Build Step** - Deploy instantly, no compilation required
+-  **Zero Build Step** - Deploy instantly, no compilation required
 - 📦 **50KB Footprint** - Entire framework smaller than most libraries
 - ♿ **WCAG 2.1 AA Compliant** - Built-in accessibility from day one
 - 🔐 **Security Hardened** - CSP, SRI, input validation, error recovery
@@ -1270,7 +1270,7 @@ A **production-ready**, **zero-dependency** PWA Game Framework with enterprise-g
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Run the Development Server
 
@@ -1288,7 +1288,7 @@ Edit `js/scenes/GameScene.js` - all game logic goes here!
 
 ---
 
-## 📂 Project Architecture
+##  Project Architecture
 
 ```
 {project_name}/
@@ -1365,11 +1365,11 @@ canvas.style.width = window.innerWidth + 'px';
 **File:** `js/core/AssetLoader.js`
 
 **Features:**
-- ✅ Chunked loading (5 assets at a time) - prevents mobile network saturation
-- ✅ Automatic retry (2 attempts with exponential backoff: 1s, 2s)
-- ✅ Graceful fallbacks (placeholders for failed images)
-- ✅ Progress tracking callback support
-- ✅ Failed asset tracking for debugging
+- SUCCESS: Chunked loading (5 assets at a time) - prevents mobile network saturation
+- SUCCESS: Automatic retry (2 attempts with exponential backoff: 1s, 2s)
+- SUCCESS: Graceful fallbacks (placeholders for failed images)
+- SUCCESS: Progress tracking callback support
+- SUCCESS: Failed asset tracking for debugging
 
 **Usage:**
 ```javascript
@@ -1688,8 +1688,8 @@ Navigate to `http://localhost:8000` and play!
 5. Ensure files exist in `assets/` directory
 
 **Common Mistakes:**
-- ❌ `'assets/player.png'` vs ✅ `'assets/textures/player.png'`
-- ❌ Case sensitivity: `Player.png` ≠ `player.png` on Linux/Mac
+- ERROR: `'assets/player.png'` vs SUCCESS: `'assets/textures/player.png'`
+- ERROR: Case sensitivity: `Player.png` ≠ `player.png` on Linux/Mac
 
 ---
 
@@ -1721,12 +1721,12 @@ Navigate to `http://localhost:8000` and play!
 
 **1. Reduce Draw Calls**
 ```javascript
-// ❌ Bad: Drawing thousands of particles
+// ERROR: Bad: Drawing thousands of particles
 for(let p of particles) {{
     ctx.fillRect(p.x, p.y, 2, 2);
 }}
 
-// ✅ Good: Use offscreen canvas or sprite batching
+// SUCCESS: Good: Use offscreen canvas or sprite batching
 ```
 
 **2. Use Object Pooling**
@@ -1749,14 +1749,14 @@ class ObjectPool {{
 **3. Check Frame Delta Warnings**
 Look for console messages like:
 ```
-⚠️ Frame took 0.15s - skipping to prevent spiral of death
+[WARN] Frame took 0.15s - skipping to prevent spiral of death
 ```
 
 This means a frame took >100ms. Profile with DevTools Performance tab.
 
 ---
 
-## 🚀 Deployment
+##  Deployment
 
 ### Netlify (Recommended)
 
@@ -1954,26 +1954,26 @@ DOMUtils.hide(elementId)  // Add 'hidden' class
 
 ### 1. Content Security Policy (CSP)
 Prevents XSS attacks by restricting script sources:
-- ✅ Only scripts from same origin allowed
-- ✅ Inline scripts blocked
-- ✅ External resources explicitly whitelisted
+- SUCCESS: Only scripts from same origin allowed
+- SUCCESS: Inline scripts blocked
+- SUCCESS: External resources explicitly whitelisted
 
 ### 2. Subresource Integrity (SRI)
 CDN assets verified with cryptographic hashes:
-- ✅ Font Awesome integrity checked
-- ✅ Prevents CDN tampering
-- ✅ `crossorigin="anonymous"` for CORS
+- SUCCESS: Font Awesome integrity checked
+- SUCCESS: Prevents CDN tampering
+- SUCCESS: `crossorigin="anonymous"` for CORS
 
 ### 3. Input Validation
 All user inputs sanitized:
-- ✅ Settings values validated
-- ✅ No code injection possible
-- ✅ Type checking on all inputs
+- SUCCESS: Settings values validated
+- SUCCESS: No code injection possible
+- SUCCESS: Type checking on all inputs
 
 ### 4. Service Worker Security
-- ✅ Cache versioning prevents poisoning
-- ✅ No eval() or unsafe code execution
-- ✅ HTTPS required for service worker
+- SUCCESS: Cache versioning prevents poisoning
+- SUCCESS: No eval() or unsafe code execution
+- SUCCESS: HTTPS required for service worker
 
 ---
 
@@ -1988,10 +1988,10 @@ All user inputs sanitized:
 | `Enter` | Activate buttons and links |
 
 ### Screen Reader Support
-- ✅ All buttons have `aria-label` attributes
-- ✅ Modals use `role="dialog"` and `aria-modal="true"`
-- ✅ Proper heading hierarchy (h1, h2, h3)
-- ✅ Focus management (auto-focus on modal open)
+- SUCCESS: All buttons have `aria-label` attributes
+- SUCCESS: Modals use `role="dialog"` and `aria-modal="true"`
+- SUCCESS: Proper heading hierarchy (h1, h2, h3)
+- SUCCESS: Focus management (auto-focus on modal open)
 
 ### Focus Trapping
 Modals trap keyboard focus:
@@ -2013,7 +2013,7 @@ Check `js/scenes/GameScene.js` comments for inline examples.
 
 ---
 
-## 📄 License
+##  License
 
 This framework is open source. Use it for any purpose - personal, educational, or commercial.
 
@@ -2111,32 +2111,31 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         # Validate project name
         project_name = validate_project_name(project_name)
         if dry_run:
-            print(f"🔍 DRY RUN MODE: Previewing project '{project_name}'")
+            print(f"[DRY RUN] Previewing project '{project_name}'")
         else:
-            print(f"📝 Creating project: {project_name}")
+            print(f"Creating project: {project_name}")
 
     except ValueError as e:
-        print(f"❌ Invalid project name: {e}")
+        print(f"ERROR: Invalid project name: {e}")
         return False
 
     base = Path.cwd() / project_name
 
     # Check if directory already exists
     if base.exists():
-        print(f"❌ Error: Directory '{project_name}' already exists")
+        print(f"ERROR: Directory '{project_name}' already exists")
         return False
 
     # DRY RUN: Preview mode
     if dry_run:
         print("\n" + "=" * 60)
-        print("🔍 DRY RUN PREVIEW")
+        print("DRY RUN PREVIEW")
         print("=" * 60)
-        print(f"\n📂 Would create directory: {base.absolute()}")
+        print(f"\nWould create directory: {base.absolute()}")
         print(
-            f"\n📝 Would generate {len(Templates.__dict__) - 2} files:"
+            f"\n Would generate {len(Templates.__dict__) - 2} files:"
         )  # -2 for __module__ and __doc__
 
-        file_count = 0
         # Preview directory structure
         print("\n   Directory Structure:")
         print(f"   {project_name}/")
@@ -2162,14 +2161,14 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         print("       └── icons/")
 
         print("\n" + "=" * 60)
-        print("✅ Dry run complete - no files created")
-        print("\n💡 To create the project, run without --dry-run flag")
+        print("Dry run complete - no files created")
+        print("\nTip: To create the project, run without --dry-run flag")
         print("=" * 60)
         return True
 
     # Check if directory already exists
     if base.exists():
-        print(f"❌ Error: Folder '{project_name}' already exists.")
+        print(f"ERROR: Error: Folder '{project_name}' already exists.")
         print(f"   Path: {base.absolute()}")
         return False
 
@@ -2210,7 +2209,7 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
     ]
 
     try:
-        print("📁 Creating directory structure...")
+        print(" Creating directory structure...")
         base.mkdir()
 
         for file_path in structure.keys():
@@ -2218,9 +2217,9 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
 
         for d in asset_dirs:
             d.mkdir(parents=True, exist_ok=True)
-        print("   ✓ Directories created")
+        print("   [OK] Directories created")
 
-        print("📄 Writing files...")
+        print(" Writing files...")
         files_created = 0
         for file_path, content in structure.items():
             try:
@@ -2228,8 +2227,8 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
                     f.write(content)
                 files_created += 1
             except Exception as e:
-                print(f"   ⚠️  Failed to create {file_path.name}: {e}")
-        print(f"   ✓ {files_created} files created")
+                print(f"   [WARN]  Failed to create {file_path.name}: {e}")
+        print(f"   [OK] {files_created} files created")
 
         # Create placeholder icon
         (base / "assets" / "icons" / "icon-192x192.png").touch()
@@ -2238,21 +2237,21 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         gitignore_path = base / ".gitignore"
         with open(gitignore_path, "w", encoding="utf-8") as f:
             f.write("node_modules/\n.DS_Store\n*.log\n.vscode/\n__pycache__/\n*.pyc\n")
-        print("   ✓ .gitignore created")
+        print("   [OK] .gitignore created")
 
         print("\n" + "=" * 60)
-        print("✅ PWA Game Framework Generated Successfully!")
+        print("SUCCESS: PWA Game Framework Generated!")
         print("=" * 60)
-        print(f"\n📂 Project: {project_name}")
-        print(f"📍 Location: {base.absolute()}")
-        print("\n🚀 Next Steps:")
+        print(f"\nProject: {project_name}")
+        print(f"Location: {base.absolute()}")
+        print("\nNext Steps:")
         print(f"   1. cd {project_name}")
         print("   2. Start a web server:")
         print("      • python -m http.server 8000")
         print("      • npx serve (if Node.js installed)")
         print("      • VS Code Live Server extension")
         print("   3. Open http://localhost:8000")
-        print("\n💡 Tips:")
+        print("\nTips:")
         print("   • Edit js/scenes/GameScene.js to add your game logic")
         print("   • Add assets to assets/ directory")
         print("   • Update MANIFEST in js/main.js to preload assets")
@@ -2261,17 +2260,19 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         return True
 
     except PermissionError:
-        print(f"❌ Permission Error: Cannot create files in {base.parent.absolute()}")
+        print(
+            f"ERROR: Permission Error - Cannot create files in {base.parent.absolute()}"
+        )
         print(
             "   Try running with appropriate permissions or choose a different location."
         )
         return False
     except OSError as e:
-        print(f"❌ OS Error: {e}")
+        print(f"ERROR: OS Error - {e}")
         print("   Check disk space and file system permissions.")
         return False
     except Exception as e:
-        print(f"❌ Unexpected Error: {e}")
+        print(f"ERROR: Unexpected Error - {e}")
         print(f"   Error type: {type(e).__name__}")
         import traceback
 
@@ -2319,7 +2320,7 @@ Only alphanumeric characters, hyphens, and underscores are allowed.
     if not project_name:
         # Check if running in non-interactive environment (CI, piped input, etc.)
         if not sys.stdin.isatty():
-            print("❌ Error: Project name is required (non-interactive mode)")
+            print("ERROR: Project name is required (non-interactive mode)")
             print("\nUsage: python pwa_create.py <project-name>")
             sys.exit(1)
 
@@ -2332,11 +2333,11 @@ Only alphanumeric characters, hyphens, and underscores are allowed.
         try:
             project_name = input("Enter project name: ").strip()
         except (KeyboardInterrupt, EOFError):
-            print("\n\n👋 Cancelled by user")
+            print("\n\nCancelled by user")
             sys.exit(1)  # Exit with error code when cancelled
 
     if not project_name:
-        print("❌ Error: Project name is required")
+        print("ERROR: Project name is required")
         print("\nUsage: python pwa_create.py <project-name>")
         sys.exit(1)
 
