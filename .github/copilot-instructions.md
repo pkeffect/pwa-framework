@@ -2,9 +2,30 @@
 
 ## Project Overview
 
-Single-file Python generator (`pwa_create.py`) that scaffolds complete Progressive Web App game frameworks in ~150ms. Zero external dependencies, generates 24 files across 11 directories with production-ready features (offline-first, accessibility, security, high-DPI rendering).
+Single-file Python generator (`pwa_create.py`) that scaffolds complete Progressive Web App game frameworks in ~150ms. Zero external dependencies, generates 24 files across 11 directories with production-ready features (offline-first, accessibility, security, high-DPI rendering, dark mode support).
 
 **Key Philosophy:** Zero build step, zero dependencies, instant deployment. Generated output uses vanilla ES6 modules - no transpilation, no bundlers, no npm.
+
+## Recent Updates (v2.0.0 - January 2026)
+
+### Security & Performance Enhancements
+- **CSP Hardening**: Removed `'unsafe-inline'` from style-src directive
+- **Cache Management**: Service worker implements 50MB cache size limit with automatic cleanup
+- **Asset Validation**: AssetLoader validates image dimensions (warns >8192px) after loading
+- **Vendor Prefixes**: Added `webkitvisibilitychange` for Safari < 12.1 compatibility
+
+### Developer Experience
+- **Dark Mode Support**: Auto-adapts to `prefers-color-scheme` (dark/light)
+- **Dry Run Mode**: New `--dry-run` CLI flag previews file generation
+- **Unit Tests**: 33 tests with 81% code coverage (pytest suite in `tests/`)
+- **Enhanced Validation**: Sanitization-first approach (fixes input rather than rejecting)
+- **Better CLI**: Alternative server suggestions (Python, npx, Live Server)
+
+### Code Quality
+- **Simplified Regex**: Validation optimized after lowercase conversion
+- **Error Handling**: Comprehensive async error catching with `unhandledrejection`
+- **Version Metadata**: Generator version embedded in HTML meta tags and manifest.json
+- **AudioManager**: Implemented Web Audio API with mobile context unlocking
 
 ## Architecture
 

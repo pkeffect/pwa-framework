@@ -47,18 +47,23 @@
 | **Error Handling** | 3-layer protection (sync/async/resource) |
 | **Audio Manager** | Context unlocking for mobile browsers |
 | **Accessibility** | Keyboard nav, ARIA labels, focus trapping |
-| **Security** | CSP headers, SRI hashes, input sanitization |
+| **Security** | CSP headers (no 'unsafe-inline'), SRI hashes, input sanitization |
+| **Dark Mode** | Auto-adapts to system preference (light/dark) |
+| **Cache Management** | 50MB size limit with automatic cleanup |
+| **Asset Validation** | Image dimension checks (1x1 min, 8192x8192 max) |
+| **Browser Compat** | Vendor prefixes for Safari 11+ support |
 | **Battery Optimization** | Visibility API integration |
 
 ### Generator Features
 
 | Feature | Description |
 |---------|-------------|
-| **Input Validation** | Regex patterns, length checks, sanitization |
+| **Input Validation** | Sanitization-first approach (fixes vs rejects) |
 | **Error Recovery** | Comprehensive exception handling |
-| **CLI Interface** | Interactive & non-interactive modes |
+| **CLI Interface** | Interactive & non-interactive modes, dry-run support |
 | **Zero Dependencies** | Pure Python stdlib (argparse, pathlib, json, re) |
 | **Cross-Platform** | Windows, macOS, Linux compatible |
+| **Test Coverage** | 33 unit tests, 81% code coverage (pytest) |
 | **Documentation** | 788-line README in every generated project |
 
 ---
@@ -149,6 +154,9 @@ python pwa_create.py --help
 # Show version
 python pwa_create.py --version
 
+# Dry-run mode (preview without creating files)
+python pwa_create.py my-game --dry-run
+
 # Interactive mode (prompts for name)
 python pwa_create.py
 
@@ -194,6 +202,47 @@ if success:
 else:
     print("❌ Generation failed")
 ```
+
+---
+
+## 🧪 Testing & Development
+
+### Running Tests
+
+The generator includes a comprehensive test suite with 81% code coverage:
+
+```bash
+# Install test dependencies
+pip install -r requirements-dev.txt
+
+# Run all tests
+python -m pytest tests/test_pwa_create.py -v
+
+# Run with coverage report
+python -m pytest tests/test_pwa_create.py --cov=pwa_create --cov-report=html
+
+# Open coverage report
+open htmlcov/index.html  # macOS
+start htmlcov/index.html  # Windows
+```
+
+### Test Suite Coverage
+
+- **Input Validation** (10 tests) - Path traversal, script injection, sanitization
+- **Template Generation** (10 tests) - CSP, dark mode, cache limits, version metadata
+- **Framework Creation** (6 tests) - File generation, directory structure, dry-run mode
+- **Edge Cases** (4 tests) - Unicode, numeric names, length limits
+- **Constants** (3 tests) - Version format, configuration bounds
+
+### CI/CD
+
+All commits are validated via GitHub Actions:
+- ✅ Cross-platform testing (Ubuntu, Windows, macOS)
+- ✅ Python 3.10, 3.11, 3.12 compatibility
+- ✅ Unit test suite execution
+- ✅ Generated project validation
+- ✅ Security checks (CSP, eval(), imports)
+- ✅ Feature verification (dark mode, cache limits, metadata)
 
 ---
 

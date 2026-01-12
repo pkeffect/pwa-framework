@@ -56,6 +56,28 @@ class Templates:
     --font-main: 'Montserrat', system-ui, sans-serif;
 }
 
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #0a0a0a;
+        --text-color: #f5f5f5;
+        --accent-color: #ff8533;
+        --border-color: #333333;
+        --glass-bg: rgba(15, 15, 15, 0.95);
+    }
+}
+
+/* Light Mode Support */
+@media (prefers-color-scheme: light) {
+    :root {
+        --bg-color: #f0f0f0;
+        --text-color: #1a1a1a;
+        --accent-color: #d45500;
+        --border-color: #cccccc;
+        --glass-bg: rgba(255, 255, 255, 0.95);
+    }
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
 
 body {
@@ -282,7 +304,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self'; img-src 'self' data:; connect-src 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; script-src 'self'; img-src 'self' data:; connect-src 'self';">
+    <meta name="generator" content="PWA Framework Generator v{SCRIPT_VERSION}">
     <title>{project_name}</title>
     
     <link rel="manifest" href="manifest.json">
@@ -534,7 +557,17 @@ window.addEventListener('DOMContentLoaded', initApp);
             if (item.type === 'image') {
                 const img = new Image();
                 img.src = item.src;
-                img.onload = () => resolve(img);
+                img.onload = () => {
+                    // Validate image dimensions
+                    if (img.width < 1 || img.height < 1) {
+                        reject(new Error(`Invalid image dimensions: ${img.width}x${img.height}`));
+                        return;
+                    }
+                    if (img.width > 8192 || img.height > 8192) {
+                        console.warn(`⚠️ Large image detected: ${img.width}x${img.height} - may impact performance`);
+                    }
+                    resolve(img);
+                };
                 img.onerror = () => reject(new Error(`Image load failed: ${item.src}`));
             } 
             else if (item.type === 'audio') {
@@ -608,8 +641,9 @@ window.addEventListener('DOMContentLoaded', initApp);
         this.isRunning = true;
         
         // Auto-pause when backgrounded to save battery
-        document.addEventListener('visibilitychange', () => {
-            if(document.hidden) {
+        const handleVisibilityChange = () => {
+            const hidden = document.hidden || document.webkitHidden;
+            if(hidden) {
                 this.isRunning = false;
                 console.log('⏸ Game Paused (Background)');
             } else {
@@ -618,7 +652,9 @@ window.addEventListener('DOMContentLoaded', initApp);
                 requestAnimationFrame(loop);
                 console.log('▶ Game Resumed');
             }
-        });
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        document.addEventListener('webkitvisibilitychange', handleVisibilityChange);
 
         const loop = (time) => {
             if(!this.isRunning) return;
@@ -1070,6 +1106,7 @@ export class ErrorHandler {
         """
         return f"""const CACHE_VERSION = 1;
 const CACHE_NAME = '{project_name.lower()}-v' + CACHE_VERSION;
+const MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB limit
 const ASSETS = [
     '/',
     '/index.html',
@@ -1077,6 +1114,30 @@ const ASSETS = [
     '/css/ui.css',
     '/js/main.js'
 ];
+
+// Helper: Limit cache size to prevent unbounded growth
+async function limitCacheSize(cacheName) {{
+    const cache = await caches.open(cacheName);
+    const keys = await cache.keys();
+    let totalSize = 0;
+    
+    for (const key of keys) {{
+        const response = await cache.match(key);
+        if (response) {{
+            const blob = await response.blob();
+            totalSize += blob.size;
+        }}
+    }}
+    
+    if (totalSize > MAX_CACHE_SIZE) {{
+        console.warn(`[SW] Cache size (${{Math.round(totalSize/1024/1024)}}MB) exceeds limit. Clearing oldest entries.`);
+        // Delete oldest entries (FIFO)
+        const entriesToDelete = Math.ceil(keys.length * 0.2); // Remove 20%
+        for (let i = 0; i < entriesToDelete; i++) {{
+            await cache.delete(keys[i]);
+        }}
+    }}
+}}
 
 // Install - cache assets
 self.addEventListener('install', e => {{
@@ -1124,8 +1185,9 @@ self.addEventListener('fetch', e => {{
                     }}
                     // Clone the response
                     const responseToCache = response.clone();
-                    caches.open(CACHE_NAME).then(cache => {{
-                        cache.put(e.request, responseToCache);
+                    caches.open(CACHE_NAME).then(async cache => {{
+                        await cache.put(e.request, responseToCache);
+                        await limitCacheSize(CACHE_NAME);
                     }});
                     return response;
                 }});
@@ -1156,6 +1218,7 @@ self.addEventListener('fetch', e => {{
             "orientation": "landscape", 
             "background_color": "#111111",
             "theme_color": "#e96714",
+            "description": f"Generated by PWA Framework Generator v{SCRIPT_VERSION}",
             "icons": [{"src": "assets/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png"}]
         }, indent=2)
 
@@ -1985,18 +2048,19 @@ def validate_project_name(name):
     if len(name) > MAX_PROJECT_NAME_LENGTH:
         raise ValueError(f"Project name too long (max {MAX_PROJECT_NAME_LENGTH} characters)")
     
-    # Check for invalid characters and enforce starting with alphanumeric
-    if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_-]*$', name):
-        raise ValueError("Project name must start with a letter or number, and contain only letters, numbers, hyphens, and underscores")
-    
-    # Sanitize: convert to lowercase and replace spaces with hyphens
-    sanitized = name.lower().replace(' ', '-')
+    # Sanitize: convert to lowercase and replace invalid chars with hyphens
+    sanitized = name.lower()
+    sanitized = re.sub(r'[^a-z0-9-_]', '-', sanitized)
     
     # Remove consecutive hyphens
     sanitized = re.sub(r'-+', '-', sanitized)
     
-    # Remove leading/trailing hyphens
-    sanitized = sanitized.strip('-')
+    # Remove leading/trailing hyphens and underscores
+    sanitized = sanitized.strip('-_')
+    
+    # Final validation: must start with alphanumeric after sanitization
+    if not sanitized or not re.match(r'^[a-z0-9]', sanitized):
+        raise ValueError("Project name must result in a valid identifier after sanitization")
     
     return sanitized
 
@@ -2004,11 +2068,12 @@ def validate_project_name(name):
 # 3. GENERATOR LOGIC
 # ==========================================
 
-def create_framework(project_name: str) -> bool:
+def create_framework(project_name: str, dry_run: bool = False) -> bool:
     """Generate a complete PWA Game Framework.
     
     Args:
         project_name: Validated project name
+        dry_run: If True, only preview without creating files
         
     Returns:
         bool: True if successful, False otherwise
@@ -2016,13 +2081,60 @@ def create_framework(project_name: str) -> bool:
     try:
         # Validate project name
         project_name = validate_project_name(project_name)
-        print(f"📝 Creating project: {project_name}")
+        if dry_run:
+            print(f"🔍 DRY RUN MODE: Previewing project '{project_name}'")
+        else:
+            print(f"📝 Creating project: {project_name}")
         
     except ValueError as e:
         print(f"❌ Invalid project name: {e}")
         return False
     
     base = Path.cwd() / project_name
+    
+    # Check if directory already exists
+    if base.exists():
+        print(f"❌ Error: Directory '{project_name}' already exists")
+        return False
+    
+    # DRY RUN: Preview mode
+    if dry_run:
+        print("\n" + "="*60)
+        print("🔍 DRY RUN PREVIEW")
+        print("="*60)
+        print(f"\n📂 Would create directory: {base.absolute()}")
+        print(f"\n📝 Would generate {len(Templates.__dict__) - 2} files:")  # -2 for __module__ and __doc__
+        
+        file_count = 0
+        # Preview directory structure
+        print("\n   Directory Structure:")
+        print(f"   {project_name}/")
+        print("   ├── index.html")
+        print("   ├── manifest.json")
+        print("   ├── service-worker.js")
+        print("   ├── README.md")
+        print("   ├── .gitignore")
+        print("   ├── css/")
+        print("   │   ├── main.css")
+        print("   │   └── ui.css")
+        print("   ├── js/")
+        print("   │   ├── main.js")
+        print("   │   ├── core/")
+        print("   │   │   ├── Renderer.js")
+        print("   │   │   └── GameLoop.js")
+        print("   │   ├── scenes/")
+        print("   │   │   ├── MenuScene.js")
+        print("   │   │   └── GameScene.js")
+        print("   │   ├── utils/")
+        print("   │   └── ui/")
+        print("   └── assets/")
+        print("       └── icons/")
+        
+        print("\n" + "="*60)
+        print("✅ Dry run complete - no files created")
+        print("\n💡 To create the project, run without --dry-run flag")
+        print("="*60)
+        return True
     
     # Check if directory already exists
     if base.exists():
@@ -2111,7 +2223,10 @@ def create_framework(project_name: str) -> bool:
         print(f"📍 Location: {base.absolute()}")
         print("\n🚀 Next Steps:")
         print(f"   1. cd {project_name}")
-        print("   2. python -m http.server 8000")
+        print("   2. Start a web server:")
+        print("      • python -m http.server 8000")
+        print("      • npx serve (if Node.js installed)")
+        print("      • VS Code Live Server extension")
         print("   3. Open http://localhost:8000")
         print("\n💡 Tips:")
         print("   • Edit js/scenes/GameScene.js to add your game logic")
@@ -2156,6 +2271,11 @@ Only alphanumeric characters, hyphens, and underscores are allowed.
         help="Project name (letters, numbers, hyphens, underscores only)"
     )
     parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Preview file generation without creating files"
+    )
+    parser.add_argument(
         "-v", "--version",
         action="version",
         version=f"PWA Framework Generator v{SCRIPT_VERSION}"
@@ -2185,7 +2305,7 @@ Only alphanumeric characters, hyphens, and underscores are allowed.
         sys.exit(1)
     
     # Create the framework
-    success = create_framework(project_name)
+    success = create_framework(project_name, dry_run=args.dry_run)
     
     # Exit with appropriate code
     sys.exit(0 if success else 1)
