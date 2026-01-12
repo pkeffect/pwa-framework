@@ -158,8 +158,8 @@ jobs:
         run: |
           cd release-test
           
-          # No eval() usage
-          if grep -r "eval(" . 2>/dev/null; then
+          # No eval() usage in code files (exclude README.md)
+          if grep -r "eval(" --include="*.js" --include="*.html" --include="*.css" . 2>/dev/null; then
             echo "ERROR: Found eval() in generated code"
             exit 1
           fi
