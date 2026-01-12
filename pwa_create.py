@@ -16,6 +16,7 @@ License: Open Source
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -23,14 +24,12 @@ from pathlib import Path
 # Fix Windows encoding for emoji support
 if sys.platform == "win32":
     try:
+        # Set console encoding to UTF-8 on Windows
         sys.stdout.reconfigure(encoding="utf-8")
         sys.stderr.reconfigure(encoding="utf-8")
-    except AttributeError:
-        # Python < 3.7 fallback
-        import codecs
-
-        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "strict")
-        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer, "strict")
+    except (AttributeError, OSError):
+        # Fallback: just set environment variable
+        os.environ["PYTHONIOENCODING"] = "utf-8"
 
 # Constants
 MAX_PROJECT_NAME_LENGTH = 50
