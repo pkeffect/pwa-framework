@@ -534,8 +534,8 @@ SOFTWARE.
 
 - 🐛 **Bug Reports:** [GitHub Issues](https://github.com/pkeffect/pwa-framework-generator/issues)
 - 💡 **Feature Requests:** [GitHub Discussions](https://github.com/pkeffect/pwa-framework-generator/discussions)
-- 📧 **Email:** your.email@example.com
-- 🌐 **Website:** https://yourwebsite.com
+- 📧 **Email:** pkeffect@gmail.com
+- 🌐 **Website:** https://internode.info/
 
 ---
 
@@ -548,14 +548,6 @@ SOFTWARE.
 - [ ] Touch input handler
 - [ ] Multiple theme presets (dark, light, cyberpunk)
 - [ ] Asset optimizer (image compression, audio conversion)
-
-### v3.0.0 (Future)
-
-- [ ] Multi-language support
-- [ ] Test framework integration (Jest, Vitest)
-- [ ] GitHub Actions CI/CD templates
-- [ ] Docker deployment support
-- [ ] Backend integration templates (Firebase, Supabase)
 
 ---
 
