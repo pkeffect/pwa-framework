@@ -75,7 +75,7 @@
 
 ```bash
 # Clone or download pwa_create.py
-curl -O https://raw.githubusercontent.com/yourusername/pwa-framework-generator/main/pwa_create.py
+curl -O https://raw.githubusercontent.com/pkeffect/pwa-framework-generator/main/pwa_create.py
 
 # Or just download the single file - no installation needed!
 ```
@@ -459,7 +459,7 @@ Contributions welcome! This is a single-file generator, so changes are straightf
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/pwa-framework-generator.git
+git clone https://github.com/pkeffect/pwa-framework-generator.git
 cd pwa-framework-generator
 
 # No installation needed - just edit pwa_create.py
@@ -532,8 +532,8 @@ SOFTWARE.
 
 ## 📞 Support
 
-- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/yourusername/pwa-framework-generator/issues)
-- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/yourusername/pwa-framework-generator/discussions)
+- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/pkeffect/pwa-framework-generator/issues)
+- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/pkeffect/pwa-framework-generator/discussions)
 - 📧 **Email:** your.email@example.com
 - 🌐 **Website:** https://yourwebsite.com
 
@@ -561,10 +561,10 @@ SOFTWARE.
 
 ## 📊 Stats
 
-![GitHub Stars](https://img.shields.io/github/stars/yourusername/pwa-framework-generator?style=social)
-![GitHub Forks](https://img.shields.io/github/forks/yourusername/pwa-framework-generator?style=social)
-![GitHub Issues](https://img.shields.io/github/issues/yourusername/pwa-framework-generator)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/yourusername/pwa-framework-generator)
+![GitHub Stars](https://img.shields.io/github/stars/pkeffect/pwa-framework-generator?style=social)
+![GitHub Forks](https://img.shields.io/github/forks/pkeffect/pwa-framework-generator?style=social)
+![GitHub Issues](https://img.shields.io/github/issues/pkeffect/pwa-framework-generator)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/pkeffect/pwa-framework-generator)
 
 ---
 
