@@ -7,6 +7,7 @@
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 ![Build Time](https://img.shields.io/badge/build_time-~150ms-brightgreen.svg)
 ![Dependencies](https://img.shields.io/badge/dependencies-zero-success.svg)
+![Tests](https://github.com/pkeffect/pwa-framework/actions/workflows/validate.yml/badge.svg)
 
 **Generate production-ready PWA game frameworks in milliseconds.**
 

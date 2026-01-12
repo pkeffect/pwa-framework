@@ -14,14 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.1] - 2026-01-11
 
 ### Fixed
-- **Windows Unicode Support**: Added UTF-8 encoding configuration for Windows console to fix emoji rendering (fixes CI failures on windows-latest)
+- **Cross-Platform Console Output**: Removed all emoji characters and replaced with ASCII symbols for universal compatibility
+- **Windows Unicode Support**: Added PYTHONIOENCODING environment variable to GitHub Actions workflows for UTF-8 support
 - **CI/CD Compatibility**: Added `sys.stdin.isatty()` check to prevent interactive prompts in non-interactive environments (GitHub Actions, piped input)
 - **Exit Codes**: User cancellation (Ctrl+C/EOF) now exits with code 1 instead of 0
-- **Code Quality**: Removed all trailing whitespace from source files
-- **Error Messages**: Improved error message clarity for non-interactive mode ("Project name is required (non-interactive mode)")
+- **Code Quality**: Removed all trailing whitespace and unused variables from source files
 - **Security Check**: Updated release.yml workflow to exclude documentation files from eval() grep search
 
 ### Changed
+- Console output now uses plain ASCII characters ([OK], ERROR:, etc.) instead of emojis for Windows compatibility
 - GitHub Actions CI/CD workflow now fully operational with matrix testing (3 OS × 3 Python versions)
 
 ## [2.0.0] - 2026-01-11
