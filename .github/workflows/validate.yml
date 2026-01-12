@@ -26,9 +26,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Display Python version
         run: python --version
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Install test dependencies
         run: |
@@ -39,12 +43,18 @@ jobs:
         run: |
           python -m pytest tests/test_pwa_create.py -v --cov=pwa_create --cov-report=term
           echo "✓ All unit tests passed"
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Test generator help
         run: python pwa_create.py --help
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Test generator version
         run: python pwa_create.py --version
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Test dry-run mode
         run: |
@@ -55,9 +65,13 @@ jobs:
           fi
           echo "✓ Dry-run mode working correctly"
         shell: bash
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Generate test project
         run: python pwa_create.py ci-test-game
+        env:
+          PYTHONIOENCODING: utf-8
       
       - name: Verify project directory created
         run: |
