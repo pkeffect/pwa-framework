@@ -447,11 +447,9 @@ pwa_create.py (2,192 lines)
 |------|-------|------|
 | **External Libraries** | 0 | ✅ Zero risk |
 | **Stdlib Modules** | 5 | ✅ Stable (argparse, json, re, sys, pathlib) |
-| **Python Version** | 3.7+ | ⚠️ Python 3.7 EOL 2023-06-27 |
+| **Python Version** | 3.10-3.12 | ✅ Actively supported |
 
-**Recommendation:** Bump minimum to Python 3.8+ (EOL 2024-10)
-
-**Maintainability Grade: A**
+**Maintainability Grade: A+**
 
 ---
 
@@ -496,7 +494,7 @@ pwa_create.py (2,192 lines)
 | Risk | Probability | Impact | Mitigation |
 |------|-------------|--------|------------|
 | **Browser API Changes** | Low | Medium | Use stable APIs (ES6, Canvas, Service Worker) |
-| **Python Version Compatibility** | Medium | Low | Test on 3.7, 3.8, 3.9, 3.10, 3.11 |
+| **Python Version Compatibility** | Low | Low | Requires 3.10-3.12 (all actively supported) |
 | **File System Permissions** | Medium | Medium | Clear error messages guide users |
 | **User Input Injection** | Low | High | Regex validation, pathlib safety |
 
@@ -542,9 +540,9 @@ pwa_create.py (2,192 lines)
 |------------|--------|--------|
 | **Bonus: Zero Dependencies** | +2 | Exceptional simplicity |
 | **Bonus: Comprehensive Docs** | +1 | 2,408 lines of documentation |
-| **Penalty: Python 3.7 EOL** | -1 | Security concern (minor) |
+| **Bonus: Modern Python** | +1 | Requires actively supported versions |
 
-**Final Score: 97/100**
+**Final Score: 99/100**
 
 ---
 
@@ -563,10 +561,9 @@ pwa_create.py (2,192 lines)
 
 ### Areas for Improvement
 
-1. ⚠️ **Python Version** - Bump minimum from 3.7 to 3.8+ (3.7 EOL)
-2. ⚠️ **TypeScript Option** - Add optional TS template for large projects
-3. ⚠️ **File Overwrite Warning** - Prompt before overwriting existing directories
-4. ⚠️ **Asset Examples** - Include sample images/audio in generated scaffold
+1. ⚠️ **TypeScript Option** - Add optional TS template for large projects
+2. ⚠️ **File Overwrite Warning** - Prompt before overwriting existing directories
+3. ⚠️ **Asset Examples** - Include sample images/audio in generated scaffold
 
 ### Recommendations
 
