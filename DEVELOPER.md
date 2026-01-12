@@ -30,7 +30,7 @@ python pwa_create.py my-project
 
 **Input:** Project name (alphanumeric, hyphens, underscores)  
 **Output:** Complete directory structure with all necessary files  
-**Dependencies:** Python stdlib only (argparse, json, re, sys, pathlib)
+**Dependencies:** Python 3.10-3.12 stdlib only (argparse, json, re, sys, pathlib)
 
 ### Key Features of Generator
 

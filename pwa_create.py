@@ -3,6 +3,8 @@
 A single-file Python script that generates professional-grade Progressive Web Applications
 for game development. Zero dependencies, instant deployment, production-ready.
 
+Requires: Python 3.10 - 3.12
+
 Usage:
     python pwa_create.py my-game
     python pwa_create.py --help

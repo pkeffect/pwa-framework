@@ -21,6 +21,7 @@ The PWA Game Framework Generator (`pwa_create.py`) is a **production-ready**, si
 ### Audit Scope
 
 - **Generator Script:** `pwa_create.py` (2,192 lines)
+- **Python Version:** 3.10 - 3.12
 - **Generated Output:** 24 files across 11 directories (1,460 LOC)
 - **Documentation:** README.md (788 lines), DEVELOPER.md (520 lines)
 - **Test Coverage:** Manual testing, SonarQube analysis

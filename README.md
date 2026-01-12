@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
-![Python](https://img.shields.io/badge/python-3.7+-green.svg)
+![Python](https://img.shields.io/badge/python-3.10--3.12-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 ![Build Time](https://img.shields.io/badge/build_time-~150ms-brightgreen.svg)
 ![Dependencies](https://img.shields.io/badge/dependencies-zero-success.svg)
@@ -67,7 +67,7 @@
 
 ### Prerequisites
 
-- Python 3.7+ (uses `pathlib`, f-strings)
+- Python 3.10 - 3.12 (uses `pathlib`, f-strings, match-case)
 - Modern web browser for testing generated output
 - HTTP server for local development (Python's built-in works)
 
