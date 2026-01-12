@@ -1,0 +1,452 @@
+name: Validate Generator
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-generator:
+    name: Test on ${{ matrix.os }} - Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Display Python version
+        run: python --version
+      
+      - name: Test generator help
+        run: python pwa_create.py --help
+      
+      - name: Test generator version
+        run: python pwa_create.py --version
+      
+      - name: Generate test project
+        run: python pwa_create.py ci-test-game
+      
+      - name: Verify project directory created
+        run: |
+          if [ ! -d "ci-test-game" ]; then
+            echo "ERROR: Project directory not created"
+            exit 1
+          fi
+        shell: bash
+      
+      - name: Verify critical files exist
+        run: |
+          files=(
+            "index.html"
+            "manifest.json"
+            "service-worker.js"
+            "README.md"
+            ".gitignore"
+            "css/main.css"
+            "css/ui.css"
+            "js/main.js"
+            "js/core/Renderer.js"
+            "js/core/GameLoop.js"
+            "js/core/AssetLoader.js"
+            "js/core/AudioManager.js"
+            "js/core/InputManager.js"
+            "js/scenes/SceneManager.js"
+            "js/scenes/MenuScene.js"
+            "js/scenes/GameScene.js"
+            "js/state/Store.js"
+            "js/state/SaveSystem.js"
+            "js/state/Settings.js"
+            "js/state/Scoreboard.js"
+            "js/ui/UIManager.js"
+            "js/ui/ErrorDisplay.js"
+            "js/utils/MathUtils.js"
+            "js/utils/DOMUtils.js"
+            "js/utils/ErrorHandler.js"
+          )
+          
+          cd ci-test-game
+          missing=0
+          for file in "${files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "MISSING: $file"
+              missing=$((missing + 1))
+            fi
+          done
+          
+          if [ $missing -gt 0 ]; then
+            echo "ERROR: $missing files missing"
+            exit 1
+          fi
+          
+          echo "✓ All 24 critical files present"
+        shell: bash
+      
+      - name: Verify asset directories created
+        run: |
+          dirs=(
+            "assets/icons"
+            "assets/audio"
+            "assets/textures"
+            "assets/models"
+            "assets/shaders"
+          )
+          
+          cd ci-test-game
+          for dir in "${dirs[@]}"; do
+            if [ ! -d "$dir" ]; then
+              echo "MISSING DIRECTORY: $dir"
+              exit 1
+            fi
+          done
+          
+          echo "✓ All asset directories present"
+        shell: bash
+      
+      - name: Security check - No eval() usage
+        run: |
+          cd ci-test-game
+          if grep -r "eval(" js/ css/ *.js *.html 2>/dev/null; then
+            echo "ERROR: Found eval() usage (security risk)"
+            exit 1
+          fi
+          echo "✓ No eval() found"
+        shell: bash
+      
+      - name: Security check - CSP headers present
+        run: |
+          if ! grep -q "Content-Security-Policy" ci-test-game/index.html; then
+            echo "ERROR: CSP headers missing"
+            exit 1
+          fi
+          echo "✓ CSP headers present"
+        shell: bash
+      
+      - name: Verify ES6 module syntax
+        run: |
+          cd ci-test-game/js
+          
+          # Check for .js extensions in imports
+          missing_ext=$(grep -r "from ['\"]\..*['\"]" --include="*.js" . | grep -v "\.js['\"]" || true)
+          if [ ! -z "$missing_ext" ]; then
+            echo "ERROR: Import statements missing .js extension:"
+            echo "$missing_ext"
+            exit 1
+          fi
+          
+          echo "✓ All imports have .js extensions"
+        shell: bash
+      
+      - name: Validate JSON files
+        run: |
+          cd ci-test-game
+          python -m json.tool manifest.json > /dev/null || exit 1
+          echo "✓ manifest.json is valid JSON"
+        shell: bash
+      
+      - name: Check file permissions (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          cd ci-test-game
+          # Verify no execute permissions on source files
+          if find . -type f \( -name "*.js" -o -name "*.css" -o -name "*.html" \) -perm -111; then
+            echo "WARNING: Source files should not be executable"
+          fi
+          echo "✓ File permissions checked"
+      
+      - name: Test input validation - reject invalid names
+        run: |
+          # Test with invalid characters
+          python pwa_create.py "invalid/name" && exit 1 || echo "✓ Rejected invalid name with slash"
+          python pwa_create.py "../escape" && exit 1 || echo "✓ Rejected path traversal attempt"
+          python pwa_create.py "" && exit 1 || echo "✓ Rejected empty name"
+          
+          # Test length limits (max 50 chars)
+          python pwa_create.py "a123456789012345678901234567890123456789012345678901" && exit 1 || echo "✓ Rejected too-long name"
+          
+          echo "✓ Input validation working correctly"
+        shell: bash
+      
+      - name: Test name sanitization
+        run: |
+          # Test space-to-hyphen conversion
+          python pwa_create.py "My Test Game"
+          
+          if [ ! -d "my-test-game" ]; then
+            echo "ERROR: Sanitization failed (spaces should become hyphens)"
+            exit 1
+          fi
+          
+          echo "✓ Name sanitization working"
+          rm -rf my-test-game
+        shell: bash
+      
+      - name: Verify generated README is complete
+        run: |
+          cd ci-test-game
+          lines=$(wc -l < README.md)
+          if [ $lines -lt 700 ]; then
+            echo "ERROR: README.md too short ($lines lines, expected ~788)"
+            exit 1
+          fi
+          echo "✓ README.md is comprehensive ($lines lines)"
+        shell: bash
+      
+      - name: Check for common code smells
+        run: |
+          cd ci-test-game/js
+          
+          # Check for console.log (should use ErrorDisplay)
+          if grep -r "console\.log" --include="*.js" . | grep -v "ErrorHandler\|ErrorDisplay"; then
+            echo "WARNING: Found console.log outside error handlers"
+          fi
+          
+          # Check for innerHTML (XSS risk)
+          if grep -r "innerHTML" --include="*.js" .; then
+            echo "WARNING: Found innerHTML usage (potential XSS risk)"
+          fi
+          
+          echo "✓ Code smell check complete"
+        shell: bash
+      
+      - name: Install Node.js for HTML validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - name: Validate HTML structure
+        run: |
+          cd ci-test-game
+          
+          # Basic HTML validation
+          if ! grep -q "<!DOCTYPE html>" index.html; then
+            echo "ERROR: Missing DOCTYPE"
+            exit 1
+          fi
+          
+          if ! grep -q '<html lang="en">' index.html; then
+            echo "ERROR: Missing lang attribute"
+            exit 1
+          fi
+          
+          if ! grep -q 'charset="UTF-8"' index.html; then
+            echo "ERROR: Missing UTF-8 charset"
+            exit 1
+          fi
+          
+          echo "✓ HTML structure valid"
+        shell: bash
+      
+      - name: Verify High DPI rendering pattern
+        run: |
+          if ! grep -q "devicePixelRatio" ci-test-game/js/core/Renderer.js; then
+            echo "ERROR: High DPI rendering pattern missing"
+            exit 1
+          fi
+          echo "✓ High DPI pattern present"
+        shell: bash
+      
+      - name: Check Service Worker cache strategy
+        run: |
+          if ! grep -q "CACHE_VERSION" ci-test-game/service-worker.js; then
+            echo "ERROR: Cache versioning missing"
+            exit 1
+          fi
+          echo "✓ Service Worker cache strategy present"
+        shell: bash
+      
+      - name: Verify ARIA labels for accessibility
+        run: |
+          if ! grep -q "aria-label" ci-test-game/index.html; then
+            echo "WARNING: No ARIA labels found (accessibility concern)"
+          fi
+          echo "✓ Accessibility check complete"
+        shell: bash
+      
+      - name: Test generator can run multiple times
+        run: |
+          python pwa_create.py second-test
+          python pwa_create.py third-test
+          
+          if [ ! -d "second-test" ] || [ ! -d "third-test" ]; then
+            echo "ERROR: Generator failed on subsequent runs"
+            exit 1
+          fi
+          
+          echo "✓ Generator can create multiple projects"
+        shell: bash
+      
+      - name: Verify no duplicate content
+        run: |
+          cd ci-test-game
+          # Check for accidentally duplicated code blocks in templates
+          if grep -A 5 "DUPLICATE_CHECK_MARKER" js/**/*.js 2>/dev/null; then
+            echo "WARNING: Potential duplicate code blocks"
+          fi
+          echo "✓ Duplication check complete"
+        shell: bash
+      
+      - name: Upload test artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-test-output-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: |
+            ci-test-game/
+            second-test/
+            third-test/
+          retention-days: 7
+
+  lint-python:
+    name: Lint Python Code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install linting tools
+        run: |
+          pip install flake8 black isort
+      
+      - name: Check code formatting with Black
+        run: |
+          black --check pwa_create.py || echo "::warning::Code not formatted with Black"
+      
+      - name: Check import sorting with isort
+        run: |
+          isort --check-only pwa_create.py || echo "::warning::Imports not sorted"
+      
+      - name: Lint with flake8
+        run: |
+          # Ignore line length (E501) since templates have long lines
+          flake8 pwa_create.py --max-line-length=120 --ignore=E501 || echo "::warning::Flake8 found issues"
+
+  documentation-check:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check documentation files exist
+        run: |
+          required_docs=(
+            "README.md"
+            "DEVELOPER.md"
+            "AUDIT.md"
+            ".github/copilot-instructions.md"
+          )
+          
+          for doc in "${required_docs[@]}"; do
+            if [ ! -f "$doc" ]; then
+              echo "ERROR: Missing documentation file: $doc"
+              exit 1
+            fi
+          done
+          
+          echo "✓ All required documentation present"
+      
+      - name: Verify version consistency
+        run: |
+          version_in_script=$(grep "SCRIPT_VERSION = " pwa_create.py | cut -d'"' -f2)
+          version_in_readme=$(grep "version-.*-blue" README.md | head -1 | sed 's/.*version-\(.*\)-blue.*/\1/')
+          
+          echo "Script version: $version_in_script"
+          echo "README version: $version_in_readme"
+          
+          if [ "$version_in_script" != "$version_in_readme" ]; then
+            echo "ERROR: Version mismatch between script and README"
+            exit 1
+          fi
+          
+          echo "✓ Versions are consistent"
+      
+      - name: Check for broken links in README
+        run: |
+          # Basic check for common markdown link syntax
+          if grep -E '\[.*\]\(\s*\)' README.md; then
+            echo "ERROR: Found empty links in README"
+            exit 1
+          fi
+          echo "✓ No empty links found"
+      
+      - name: Verify line count accuracy in docs
+        run: |
+          # Actual line count
+          actual_lines=$(wc -l < pwa_create.py)
+          
+          # Expected line count from docs
+          expected_lines=$(grep "2,19[0-9] lines" DEVELOPER.md | head -1 | grep -o "[0-9,]*" | tr -d ',' || echo "2194")
+          
+          echo "Actual: $actual_lines"
+          echo "Expected: ~$expected_lines"
+          
+          # Allow 5% variance
+          diff=$((actual_lines - expected_lines))
+          diff=${diff#-}  # Absolute value
+          
+          if [ $diff -gt 110 ]; then
+            echo "WARNING: Line count significantly different from docs"
+          fi
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install security tools
+        run: |
+          pip install bandit safety
+      
+      - name: Run Bandit security scan
+        run: |
+          bandit -r pwa_create.py -ll || echo "::warning::Security issues found"
+      
+      - name: Check for hardcoded secrets
+        run: |
+          if grep -iE "(password|api_key|secret|token)\s*=\s*['\"]" pwa_create.py; then
+            echo "ERROR: Potential hardcoded secrets found"
+            exit 1
+          fi
+          echo "✓ No hardcoded secrets detected"
+      
+      - name: Verify input validation patterns
+        run: |
+          if ! grep -q "validate_project_name" pwa_create.py; then
+            echo "ERROR: Input validation function missing"
+            exit 1
+          fi
+          
+          if ! grep -q "re.match" pwa_create.py; then
+            echo "ERROR: Regex validation missing"
+            exit 1
+          fi
+          
+          echo "✓ Input validation present"

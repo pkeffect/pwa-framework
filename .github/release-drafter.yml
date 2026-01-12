@@ -1,0 +1,127 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: '🚀 Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+      - 'bugfix'
+      - 'bug'
+  - title: '📝 Template Updates'
+    labels:
+      - 'template'
+      - 'generated-code'
+  - title: '📚 Documentation'
+    labels:
+      - 'documentation'
+      - 'docs'
+  - title: '🔐 Security'
+    labels:
+      - 'security'
+  - title: '⚡ Performance'
+    labels:
+      - 'performance'
+      - 'optimization'
+  - title: '🧪 Testing'
+    labels:
+      - 'test'
+      - 'testing'
+  - title: '🔧 Maintenance'
+    labels:
+      - 'chore'
+      - 'dependencies'
+      - 'refactor'
+
+version-resolver:
+  major:
+    labels:
+      - 'major'
+      - 'breaking'
+  minor:
+    labels:
+      - 'minor'
+      - 'feature'
+  patch:
+    labels:
+      - 'patch'
+      - 'fix'
+      - 'bugfix'
+  default: patch
+
+exclude-labels:
+  - 'skip-changelog'
+  - 'duplicate'
+  - 'invalid'
+  - 'wontfix'
+
+autolabeler:
+  - label: 'template'
+    files:
+      - 'pwa_create.py'
+    branch:
+      - '/templates?\/.*/'
+  - label: 'documentation'
+    files:
+      - '*.md'
+      - 'docs/**/*'
+  - label: 'test'
+    files:
+      - '.github/workflows/*.yml'
+  - label: 'security'
+    branch:
+      - '/security\/.*/'
+  - label: 'feature'
+    branch:
+      - '/feature\/.*/'
+      - '/feat\/.*/'
+  - label: 'fix'
+    branch:
+      - '/fix\/.*/'
+      - '/bugfix\/.*/'
+
+template: |
+  ## What's Changed
+  
+  $CHANGES
+  
+  ## Installation
+  
+  ```bash
+  # Download the generator
+  curl -O https://github.com/$OWNER/$REPOSITORY/releases/download/$RESOLVED_VERSION/pwa_create.py
+  
+  # Run it
+  python pwa_create.py my-game
+  ```
+  
+  ## Requirements
+  
+  - Python 3.10 - 3.12
+  - No external dependencies
+  
+  ## Generated Framework Features
+  
+  - ✨ Zero build step - deploy instantly
+  - 🚀 ~150ms generation time  
+  - 📦 50KB total footprint
+  - 🔐 Security hardened (CSP, SRI, input validation)
+  - ♿ WCAG 2.1 AA accessibility
+  - 🎨 High DPI/Retina display support
+  - 📱 PWA native (offline-first, installable)
+  
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
+
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+change-title-escapes: '\<*_&'
+
+replacers:
+  - search: '/\[Feature\]\s*/gi'
+    replace: ''
+  - search: '/\[Bug\]\s*/gi'
+    replace: ''
+  - search: '/\[Template\]\s*/gi'
+    replace: ''

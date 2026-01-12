@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/pkeffect/pwa-framework/discussions
+    about: Ask questions, share generated projects, discuss ideas
+  - name: 📚 Documentation
+    url: https://github.com/pkeffect/pwa-framework#readme
+    about: Read the comprehensive README and DEVELOPER guides
+  - name: 🔐 Security Vulnerability
+    url: https://github.com/pkeffect/pwa-framework/security/advisories/new
+    about: Report security issues privately (DO NOT open public issues)

@@ -1,0 +1,430 @@
+name: Create Release
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'pwa_create.py'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 2.1.0)'
+        required: true
+        type: string
+
+jobs:
+  check-version:
+    name: Detect Version Bump
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check.outputs.changed }}
+      new_version: ${{ steps.check.outputs.version }}
+      should_release: ${{ steps.check.outputs.should_release }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Need previous commit to compare
+      
+      - name: Check if version changed
+        id: check
+        run: |
+          # Get current version from script
+          CURRENT_VERSION=$(grep 'SCRIPT_VERSION = ' pwa_create.py | cut -d'"' -f2)
+          echo "Current version: $CURRENT_VERSION"
+          echo "version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Check if manually triggered
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "Manual release triggered for version ${{ inputs.version }}"
+            exit 0
+          fi
+          
+          # Get previous version (if exists)
+          git checkout HEAD~1 -- pwa_create.py 2>/dev/null || true
+          
+          if [ -f "pwa_create.py" ]; then
+            PREVIOUS_VERSION=$(grep 'SCRIPT_VERSION = ' pwa_create.py | cut -d'"' -f2 || echo "none")
+            git checkout HEAD -- pwa_create.py
+            
+            echo "Previous version: $PREVIOUS_VERSION"
+            
+            if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "should_release=true" >> $GITHUB_OUTPUT
+              echo "✅ Version bumped from $PREVIOUS_VERSION to $CURRENT_VERSION"
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "should_release=false" >> $GITHUB_OUTPUT
+              echo "ℹ️ No version change detected"
+            fi
+          else
+            # First commit with pwa_create.py
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "should_release=true" >> $GITHUB_OUTPUT
+            echo "✅ Initial version: $CURRENT_VERSION"
+          fi
+
+  verify-documentation:
+    name: Verify Documentation Updated
+    needs: check-version
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Check version consistency across files
+        run: |
+          VERSION="${{ needs.check-version.outputs.new_version }}"
+          
+          # Check README.md
+          if ! grep -q "version-$VERSION-blue" README.md; then
+            echo "::error::README.md version badge not updated to $VERSION"
+            exit 1
+          fi
+          
+          # Check DEVELOPER.md
+          if ! grep -q "**Version:** $VERSION" DEVELOPER.md; then
+            echo "::warning::DEVELOPER.md version not updated (optional)"
+          fi
+          
+          # Check AUDIT.md  
+          if ! grep -q "**Version:** $VERSION" AUDIT.md; then
+            echo "::warning::AUDIT.md version not updated (optional)"
+          fi
+          
+          echo "✅ Documentation versions verified"
+      
+      - name: Verify changelog exists
+        run: |
+          VERSION="${{ needs.check-version.outputs.new_version }}"
+          
+          # Check if CHANGELOG.md exists and has entry for this version
+          if [ -f "CHANGELOG.md" ]; then
+            if ! grep -q "## \[$VERSION\]" CHANGELOG.md && ! grep -q "## $VERSION" CHANGELOG.md; then
+              echo "::warning::CHANGELOG.md missing entry for version $VERSION"
+              echo "::warning::Release notes will be auto-generated from commits"
+            else
+              echo "✅ CHANGELOG.md has entry for $VERSION"
+            fi
+          else
+            echo "::warning::No CHANGELOG.md found, creating auto-generated release notes"
+          fi
+
+  run-tests:
+    name: Run Full Test Suite
+    needs: check-version
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Run generator test
+        run: |
+          python pwa_create.py release-test
+          
+          # Verify all critical files
+          cd release-test
+          
+          required_files=(
+            "index.html" "manifest.json" "service-worker.js" 
+            "README.md" ".gitignore"
+            "css/main.css" "css/ui.css"
+            "js/main.js"
+          )
+          
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Missing file: $file"
+              exit 1
+            fi
+          done
+          
+          echo "✅ All files generated successfully"
+      
+      - name: Security check
+        run: |
+          cd release-test
+          
+          # No eval() usage
+          if grep -r "eval(" . 2>/dev/null; then
+            echo "ERROR: Found eval() in generated code"
+            exit 1
+          fi
+          
+          # CSP headers present
+          if ! grep -q "Content-Security-Policy" index.html; then
+            echo "ERROR: CSP headers missing"
+            exit 1
+          fi
+          
+          echo "✅ Security checks passed"
+
+  create-release:
+    name: Create GitHub Release
+    needs: [check-version, verify-documentation, run-tests]
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for changelog generation
+      
+      - name: Extract version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${{ needs.check-version.outputs.new_version }}"
+          fi
+          
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
+      
+      - name: Check if tag exists
+        id: tag_check
+        run: |
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "::warning::Tag v${{ steps.version.outputs.version }} already exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Generate changelog from commits
+        id: changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Try to get previous tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          
+          if [ -z "$PREVIOUS_TAG" ]; then
+            # No previous tag, get all commits
+            COMMITS=$(git log --pretty=format:"- %s (%h)" --no-merges)
+          else
+            # Get commits since last tag
+            COMMITS=$(git log ${PREVIOUS_TAG}..HEAD --pretty=format:"- %s (%h)" --no-merges)
+          fi
+          
+          # Check if CHANGELOG.md exists and extract relevant section
+          if [ -f "CHANGELOG.md" ]; then
+            # Extract changelog for this version
+            CHANGELOG_SECTION=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$ d' || echo "")
+            
+            if [ -n "$CHANGELOG_SECTION" ]; then
+              echo "Using CHANGELOG.md for release notes"
+              echo "$CHANGELOG_SECTION" > release_notes.md
+            else
+              echo "CHANGELOG.md exists but no section for $VERSION, using auto-generated notes"
+              cat > release_notes.md << EOF
+          ## What's Changed
+          
+          $COMMITS
+          
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...v${VERSION}
+          EOF
+            fi
+          else
+            # Auto-generate from commits
+            cat > release_notes.md << EOF
+          ## What's Changed
+          
+          $COMMITS
+          
+          ${PREVIOUS_TAG:+**Full Changelog**: https://github.com/${{ github.repository }}/compare/${PREVIOUS_TAG}...v${VERSION}}
+          EOF
+          fi
+          
+          # Add installation instructions
+          cat >> release_notes.md << 'EOF'
+          
+          ## Installation
+          
+          ```bash
+          # Download the generator
+          curl -O https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/pwa_create.py
+          
+          # Or with wget
+          wget https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/pwa_create.py
+          
+          # Make executable (Unix/macOS)
+          chmod +x pwa_create.py
+          
+          # Run it
+          python pwa_create.py my-game
+          ```
+          
+          ## Requirements
+          
+          - Python 3.10 - 3.12
+          - No external dependencies (stdlib only)
+          
+          ## Features
+          
+          - ✨ Zero build step - deploy instantly
+          - 🚀 ~150ms generation time
+          - 📦 50KB total footprint
+          - 🔐 Security hardened (CSP, SRI, input validation)
+          - ♿ WCAG 2.1 AA accessibility
+          - 🎨 High DPI/Retina display support
+          - 📱 PWA native (offline-first, installable)
+          EOF
+          
+          cat release_notes.md
+      
+      - name: Create release archive
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          
+          # Create distribution directory
+          mkdir -p dist
+          
+          # Copy main script
+          cp pwa_create.py dist/
+          
+          # Copy documentation
+          cp README.md DEVELOPER.md AUDIT.md dist/ 2>/dev/null || true
+          
+          # Create checksums
+          cd dist
+          sha256sum pwa_create.py > SHA256SUMS
+          md5sum pwa_create.py > MD5SUMS
+          cd ..
+          
+          # Create zip archive
+          zip -r pwa-game-generator-v${VERSION}.zip dist/
+          
+          # Create tarball
+          tar -czf pwa-game-generator-v${VERSION}.tar.gz dist/
+          
+          echo "✅ Release archives created"
+      
+      - name: Create Git tag
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -a "v${{ steps.version.outputs.version }}" -m "Release v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: PWA Game Generator v${{ steps.version.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+          files: |
+            pwa_create.py
+            dist/SHA256SUMS
+            dist/MD5SUMS
+            pwa-game-generator-v${{ steps.version.outputs.version }}.zip
+            pwa-game-generator-v${{ steps.version.outputs.version }}.tar.gz
+            README.md
+            DEVELOPER.md
+            AUDIT.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Generate release summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          # 🎉 Release v${{ steps.version.outputs.version }} Created!
+          
+          ## 📦 Assets
+          
+          - \`pwa_create.py\` - Main generator script
+          - \`pwa-game-generator-v${{ steps.version.outputs.version }}.zip\` - Complete package (Windows)
+          - \`pwa-game-generator-v${{ steps.version.outputs.version }}.tar.gz\` - Complete package (Unix/macOS)
+          - \`SHA256SUMS\` - Checksum verification
+          - \`MD5SUMS\` - Checksum verification
+          - \`README.md\` - User documentation
+          - \`DEVELOPER.md\` - Technical documentation
+          - \`AUDIT.md\` - Security/quality audit
+          
+          ## 🔗 Links
+          
+          - [Release Page](https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }})
+          - [Download Script](https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/pwa_create.py)
+          
+          ## ✅ Verification
+          
+          \`\`\`bash
+          # Download and verify checksum
+          curl -LO https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/pwa_create.py
+          curl -LO https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.version }}/SHA256SUMS
+          sha256sum -c SHA256SUMS
+          \`\`\`
+          EOF
+
+  update-latest-alias:
+    name: Update Latest Release Alias
+    needs: create-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Update latest tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Delete old 'latest' tag if exists
+          git tag -d latest 2>/dev/null || true
+          git push origin :refs/tags/latest 2>/dev/null || true
+          
+          # Create new 'latest' tag pointing to current commit
+          git tag latest
+          git push origin latest
+          
+          echo "✅ 'latest' tag updated"
+
+  notify-on-failure:
+    name: Notify on Release Failure
+    needs: [check-version, verify-documentation, run-tests, create-release]
+    if: failure() && needs.check-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Create failure summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << EOF
+          # ❌ Release Failed
+          
+          Version ${{ needs.check-version.outputs.new_version }} failed to release.
+          
+          ## Troubleshooting
+          
+          1. Check that version was bumped in \`pwa_create.py\`
+          2. Verify documentation versions match in README.md, DEVELOPER.md, AUDIT.md
+          3. Ensure all tests pass
+          4. Check that the tag doesn't already exist
+          
+          ## Manual Release
+          
+          You can trigger a manual release from the Actions tab using workflow_dispatch.
+          EOF

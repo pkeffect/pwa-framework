@@ -1,0 +1,20 @@
+# Require review for generator script changes
+pwa_create.py @peffect
+
+# Template changes require extra scrutiny
+pwa_create.py @peffect
+
+# Documentation changes
+*.md @peffect
+docs/ @peffect
+
+# CI/CD workflows
+.github/workflows/ @peffect
+
+# Security-sensitive files
+SECURITY.md @peffect
+.github/ISSUE_TEMPLATE/ @peffect
+
+# Configuration files
+.github/*.yml @peffect
+.gitignore @pkeffect
