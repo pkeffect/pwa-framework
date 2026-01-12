@@ -551,15 +551,6 @@ SOFTWARE.
 
 ---
 
-## 📊 Stats
-
-![GitHub Stars](https://img.shields.io/github/stars/pkeffect/pwa-framework-generator?style=social)
-![GitHub Forks](https://img.shields.io/github/forks/pkeffect/pwa-framework-generator?style=social)
-![GitHub Issues](https://img.shields.io/github/issues/pkeffect/pwa-framework-generator)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/pkeffect/pwa-framework-generator)
-
----
-
 <div align="center">
 
 **Built with ❤️ for developers who value simplicity over complexity.**
