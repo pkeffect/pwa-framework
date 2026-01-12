@@ -29,20 +29,21 @@ SCRIPT_VERSION = "2.0.0"
 # 1. FILE CONTENT TEMPLATES
 # ==========================================
 
+
 class Templates:
     """Template content generator for PWA framework files.
-    
+
     Contains static methods that return file contents for CSS, HTML, JavaScript,
     and configuration files used in the generated PWA framework.
-    
+
     All methods are static and return strings containing the full file content.
     """
-    
+
     # --- CSS ---
     @staticmethod
     def get_main_css():
         """Generate main.css content with core layout and styling.
-        
+
         Returns:
             str: CSS content for main.css file
         """
@@ -135,7 +136,7 @@ body {
     @staticmethod
     def get_ui_css():
         """Generate ui.css content with UI component styles.
-        
+
         Returns:
             str: CSS content for ui.css file
         """
@@ -292,10 +293,10 @@ input:checked + .slider:before { transform: translateX(20px); }
     @staticmethod
     def get_html(project_name):
         """Generate index.html content with PWA structure.
-        
+
         Args:
             project_name: The name of the project for title and branding
-            
+
         Returns:
             str: HTML content for index.html file
         """
@@ -451,11 +452,11 @@ input:checked + .slider:before { transform: translateX(20px); }
 </html>"""
 
     # --- JAVASCRIPT ---
-    
+
     @staticmethod
     def get_main_js():
         """Generate main.js entry point with app initialization.
-        
+
         Returns:
             str: JavaScript content for main.js file
         """
@@ -504,7 +505,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_assetloader():
         """Generate AssetLoader.js with retry logic and fallbacks.
-        
+
         Returns:
             str: JavaScript content for AssetLoader.js
         """
@@ -598,7 +599,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_renderer():
         """Generate Renderer.js with High DPI support.
-        
+
         Returns:
             str: JavaScript content for Renderer.js
         """
@@ -630,7 +631,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_gameloop():
         """Generate GameLoop.js with visibility API and battery saving.
-        
+
         Returns:
             str: JavaScript content for GameLoop.js
         """
@@ -677,7 +678,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_input():
         """Generate InputManager.js stub.
-        
+
         Returns:
             str: JavaScript content for InputManager.js
         """
@@ -688,7 +689,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_audio():
         """Generate AudioManager.js with context unlocking.
-        
+
         Returns:
             str: JavaScript content for AudioManager.js
         """
@@ -718,7 +719,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_store():
         """Generate Store.js for global state management.
-        
+
         Returns:
             str: JavaScript content for Store.js
         """
@@ -733,7 +734,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_savesystem():
         """Generate SaveSystem.js for localStorage persistence.
-        
+
         Returns:
             str: JavaScript content for SaveSystem.js
         """
@@ -745,7 +746,7 @@ window.addEventListener('DOMContentLoaded', initApp);
     @staticmethod
     def get_js_settings():
         """Generate Settings.js for managing user preferences.
-        
+
         Returns:
             str: JavaScript content for Settings.js
         """
@@ -787,7 +788,7 @@ export class Settings {
     @staticmethod
     def get_js_scoreboard():
         """Generate Scoreboard.js stub for high score tracking.
-        
+
         Returns:
             str: JavaScript content for Scoreboard.js
         """
@@ -798,7 +799,7 @@ export class Settings {
     @staticmethod
     def get_js_scenemanager():
         """Generate SceneManager.js for scene transitions.
-        
+
         Returns:
             str: JavaScript content for SceneManager.js
         """
@@ -823,7 +824,7 @@ export class SceneManager {
     @staticmethod
     def get_js_menuscene():
         """Generate MenuScene.js with menu UI logic.
-        
+
         Returns:
             str: JavaScript content for MenuScene.js
         """
@@ -871,7 +872,7 @@ export class MenuScene {
     @staticmethod
     def get_js_gamescene():
         """Generate GameScene.js template for game logic.
-        
+
         Returns:
             str: JavaScript content for GameScene.js
         """
@@ -886,7 +887,7 @@ export class GameScene {
     @staticmethod
     def get_js_uimanager():
         """Generate UIManager.js with keyboard navigation and focus trapping.
-        
+
         Returns:
             str: JavaScript content for UIManager.js
         """
@@ -1010,7 +1011,7 @@ export class UIManager {
     @staticmethod
     def get_js_errordisplay():
         """Generate ErrorDisplay.js for showing error toasts.
-        
+
         Returns:
             str: JavaScript content for ErrorDisplay.js
         """
@@ -1030,7 +1031,7 @@ export class UIManager {
     @staticmethod
     def get_js_domutils():
         """Generate DOMUtils.js for DOM manipulation helpers.
-        
+
         Returns:
             str: JavaScript content for DOMUtils.js
         """
@@ -1048,7 +1049,7 @@ export class UIManager {
     @staticmethod
     def get_js_errorhandler():
         """Generate ErrorHandler.js with comprehensive error catching.
-        
+
         Returns:
             str: JavaScript content for ErrorHandler.js
         """
@@ -1085,7 +1086,7 @@ export class ErrorHandler {
     @staticmethod
     def get_js_mathutils():
         """Generate MathUtils.js with common math helper functions.
-        
+
         Returns:
             str: JavaScript content for MathUtils.js
         """
@@ -1097,10 +1098,10 @@ export class ErrorHandler {
     @staticmethod
     def get_sw(project_name):
         """Generate service-worker.js with cache versioning and update mechanism.
-        
+
         Args:
             project_name: The project name for cache naming
-            
+
         Returns:
             str: JavaScript content for service-worker.js
         """
@@ -1203,32 +1204,41 @@ self.addEventListener('fetch', e => {{
     @staticmethod
     def get_manifest(project_name):
         """Generate manifest.json for PWA configuration.
-        
+
         Args:
             project_name: The project name for app metadata
-            
+
         Returns:
             str: JSON content for manifest.json
         """
-        return json.dumps({
-            "name": project_name,
-            "short_name": project_name,
-            "start_url": ".",
-            "display": "standalone",
-            "orientation": "landscape", 
-            "background_color": "#111111",
-            "theme_color": "#e96714",
-            "description": f"Generated by PWA Framework Generator v{SCRIPT_VERSION}",
-            "icons": [{"src": "assets/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png"}]
-        }, indent=2)
+        return json.dumps(
+            {
+                "name": project_name,
+                "short_name": project_name,
+                "start_url": ".",
+                "display": "standalone",
+                "orientation": "landscape",
+                "background_color": "#111111",
+                "theme_color": "#e96714",
+                "description": f"Generated by PWA Framework Generator v{SCRIPT_VERSION}",
+                "icons": [
+                    {
+                        "src": "assets/icons/icon-192x192.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                    }
+                ],
+            },
+            indent=2,
+        )
 
     @staticmethod
     def get_readme(project_name):
         """Generate comprehensive README.md documentation.
-        
+
         Args:
             project_name: The project name for documentation branding
-            
+
         Returns:
             str: Markdown content for README.md
         """
@@ -2020,61 +2030,69 @@ This framework is open source. Use it for any purpose - personal, educational, o
 This framework is open source. Use it for any purpose.
 """
 
+
 # ==========================================
 # 2. INPUT VALIDATION
 # ==========================================
 
+
 def validate_project_name(name):
     """Validate and sanitize project name.
-    
+
     Args:
         name: The raw project name input
-        
+
     Returns:
         str: Sanitized project name
-        
+
     Raises:
         ValueError: If project name is invalid
     """
     if not name:
         raise ValueError("Project name cannot be empty")
-    
+
     # Remove leading/trailing whitespace
     name = name.strip()
-    
+
     # Check length
     if len(name) < MIN_PROJECT_NAME_LENGTH:
         raise ValueError("Project name cannot be empty")
     if len(name) > MAX_PROJECT_NAME_LENGTH:
-        raise ValueError(f"Project name too long (max {MAX_PROJECT_NAME_LENGTH} characters)")
-    
+        raise ValueError(
+            f"Project name too long (max {MAX_PROJECT_NAME_LENGTH} characters)"
+        )
+
     # Sanitize: convert to lowercase and replace invalid chars with hyphens
     sanitized = name.lower()
-    sanitized = re.sub(r'[^a-z0-9-_]', '-', sanitized)
-    
+    sanitized = re.sub(r"[^a-z0-9-_]", "-", sanitized)
+
     # Remove consecutive hyphens
-    sanitized = re.sub(r'-+', '-', sanitized)
-    
+    sanitized = re.sub(r"-+", "-", sanitized)
+
     # Remove leading/trailing hyphens and underscores
-    sanitized = sanitized.strip('-_')
-    
+    sanitized = sanitized.strip("-_")
+
     # Final validation: must start with alphanumeric after sanitization
-    if not sanitized or not re.match(r'^[a-z0-9]', sanitized):
-        raise ValueError("Project name must result in a valid identifier after sanitization")
-    
+    if not sanitized or not re.match(r"^[a-z0-9]", sanitized):
+        raise ValueError(
+            "Project name must result in a valid identifier after sanitization"
+        )
+
     return sanitized
+
 
 # ==========================================
 # 3. GENERATOR LOGIC
 # ==========================================
 
+
 def create_framework(project_name: str, dry_run: bool = False) -> bool:
     """Generate a complete PWA Game Framework.
-    
+
     Args:
         project_name: Validated project name
         dry_run: If True, only preview without creating files
-        
+
     Returns:
         bool: True if successful, False otherwise
     """
@@ -2085,26 +2103,28 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
             print(f"🔍 DRY RUN MODE: Previewing project '{project_name}'")
         else:
             print(f"📝 Creating project: {project_name}")
-        
+
     except ValueError as e:
         print(f"❌ Invalid project name: {e}")
         return False
-    
+
     base = Path.cwd() / project_name
-    
+
     # Check if directory already exists
     if base.exists():
         print(f"❌ Error: Directory '{project_name}' already exists")
         return False
-    
+
     # DRY RUN: Preview mode
     if dry_run:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("🔍 DRY RUN PREVIEW")
-        print("="*60)
+        print("=" * 60)
         print(f"\n📂 Would create directory: {base.absolute()}")
-        print(f"\n📝 Would generate {len(Templates.__dict__) - 2} files:")  # -2 for __module__ and __doc__
-        
+        print(
+            f"\n📝 Would generate {len(Templates.__dict__) - 2} files:"
+        )  # -2 for __module__ and __doc__
+
         file_count = 0
         # Preview directory structure
         print("\n   Directory Structure:")
@@ -2129,13 +2149,13 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         print("   │   └── ui/")
         print("   └── assets/")
         print("       └── icons/")
-        
-        print("\n" + "="*60)
+
+        print("\n" + "=" * 60)
         print("✅ Dry run complete - no files created")
         print("\n💡 To create the project, run without --dry-run flag")
-        print("="*60)
+        print("=" * 60)
         return True
-    
+
     # Check if directory already exists
     if base.exists():
         print(f"❌ Error: Folder '{project_name}' already exists.")
@@ -2148,50 +2168,43 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         base / "service-worker.js": Templates.get_sw(project_name),
         base / "index.html": Templates.get_html(project_name),
         base / "README.md": Templates.get_readme(project_name),
-        
         base / "css" / "main.css": Templates.get_main_css(),
         base / "css" / "ui.css": Templates.get_ui_css(),
-        
         base / "js" / "main.js": Templates.get_main_js(),
-        
         base / "js" / "core" / "GameLoop.js": Templates.get_js_gameloop(),
         base / "js" / "core" / "Renderer.js": Templates.get_js_renderer(),
         base / "js" / "core" / "InputManager.js": Templates.get_js_input(),
         base / "js" / "core" / "AudioManager.js": Templates.get_js_audio(),
         base / "js" / "core" / "AssetLoader.js": Templates.get_js_assetloader(),
-        
         base / "js" / "state" / "Store.js": Templates.get_js_store(),
         base / "js" / "state" / "SaveSystem.js": Templates.get_js_savesystem(),
         base / "js" / "state" / "Settings.js": Templates.get_js_settings(),
         base / "js" / "state" / "Scoreboard.js": Templates.get_js_scoreboard(),
-        
         base / "js" / "scenes" / "SceneManager.js": Templates.get_js_scenemanager(),
         base / "js" / "scenes" / "MenuScene.js": Templates.get_js_menuscene(),
         base / "js" / "scenes" / "GameScene.js": Templates.get_js_gamescene(),
-        
         base / "js" / "ui" / "UIManager.js": Templates.get_js_uimanager(),
         base / "js" / "ui" / "ErrorDisplay.js": Templates.get_js_errordisplay(),
-        
         base / "js" / "utils" / "MathUtils.js": Templates.get_js_mathutils(),
         base / "js" / "utils" / "DOMUtils.js": Templates.get_js_domutils(),
         base / "js" / "utils" / "ErrorHandler.js": Templates.get_js_errorhandler(),
     }
-    
+
     asset_dirs = [
         base / "assets" / "icons",
         base / "assets" / "audio",
         base / "assets" / "textures",
         base / "assets" / "models",
-        base / "assets" / "shaders"
+        base / "assets" / "shaders",
     ]
 
     try:
         print("📁 Creating directory structure...")
         base.mkdir()
-        
+
         for file_path in structure.keys():
             file_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
         for d in asset_dirs:
             d.mkdir(parents=True, exist_ok=True)
         print("   ✓ Directories created")
@@ -2200,7 +2213,7 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         files_created = 0
         for file_path, content in structure.items():
             try:
-                with open(file_path, 'w', encoding='utf-8') as f:
+                with open(file_path, "w", encoding="utf-8") as f:
                     f.write(content)
                 files_created += 1
             except Exception as e:
@@ -2209,16 +2222,16 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
 
         # Create placeholder icon
         (base / "assets" / "icons" / "icon-192x192.png").touch()
-        
+
         # Generate .gitignore
         gitignore_path = base / ".gitignore"
-        with open(gitignore_path, 'w', encoding='utf-8') as f:
+        with open(gitignore_path, "w", encoding="utf-8") as f:
             f.write("node_modules/\n.DS_Store\n*.log\n.vscode/\n__pycache__/\n*.pyc\n")
         print("   ✓ .gitignore created")
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✅ PWA Game Framework Generated Successfully!")
-        print("="*60)
+        print("=" * 60)
         print(f"\n📂 Project: {project_name}")
         print(f"📍 Location: {base.absolute()}")
         print("\n🚀 Next Steps:")
@@ -2233,12 +2246,14 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         print("   • Add assets to assets/ directory")
         print("   • Update MANIFEST in js/main.js to preload assets")
         print("   • See README.md for detailed documentation")
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         return True
 
     except PermissionError:
         print(f"❌ Permission Error: Cannot create files in {base.parent.absolute()}")
-        print("   Try running with appropriate permissions or choose a different location.")
+        print(
+            "   Try running with appropriate permissions or choose a different location."
+        )
         return False
     except OSError as e:
         print(f"❌ OS Error: {e}")
@@ -2248,8 +2263,10 @@ def create_framework(project_name: str, dry_run: bool = False) -> bool:
         print(f"❌ Unexpected Error: {e}")
         print(f"   Error type: {type(e).__name__}")
         import traceback
+
         traceback.print_exc()
         return False
+
 
 def main() -> None:
     """Main entry point for PWA framework generator."""
@@ -2263,52 +2280,55 @@ Examples:
   
 The project name will be sanitized (lowercased, spaces to hyphens).
 Only alphanumeric characters, hyphens, and underscores are allowed.
-        """
+        """,
     )
     parser.add_argument(
-        "name", 
-        nargs="?", 
-        help="Project name (letters, numbers, hyphens, underscores only)"
+        "name",
+        nargs="?",
+        help="Project name (letters, numbers, hyphens, underscores only)",
     )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Preview file generation without creating files"
+        help="Preview file generation without creating files",
     )
     parser.add_argument(
-        "-v", "--version",
+        "-v",
+        "--version",
         action="version",
-        version=f"PWA Framework Generator v{SCRIPT_VERSION}"
+        version=f"PWA Framework Generator v{SCRIPT_VERSION}",
     )
-    
+
     args = parser.parse_args()
 
     project_name = args.name
-    
+    dry_run = getattr(args, "dry_run", False)  # Safe access with default
+
     # Interactive mode if no name provided
     if not project_name:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("PWA Game Framework Generator")
-        print("="*60)
+        print("=" * 60)
         print("\nCreate a professional-grade, zero-dependency PWA framework")
         print("for game development.\n")
-        
+
         try:
             project_name = input("Enter project name: ").strip()
         except (KeyboardInterrupt, EOFError):
             print("\n\n👋 Cancelled by user")
             sys.exit(0)
-    
+
     if not project_name:
         print("❌ Error: Project name is required")
         print("\nUsage: python pwa_create.py <project-name>")
         sys.exit(1)
-    
+
     # Create the framework
-    success = create_framework(project_name, dry_run=args.dry_run)
-    
+    success = create_framework(project_name, dry_run=dry_run)
+
     # Exit with appropriate code
     sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main()
