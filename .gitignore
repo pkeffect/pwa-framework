@@ -37,16 +37,31 @@ env/
 # Testing
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
 .tox/
 .hypothesis/
+*.cover
+.cache
+nosetests.xml
+coverage.xml
+*.coveragerc
+junit.xml
+.testmondata
 
 # Generated test projects (from CI/development)
 ci-test-game/
+ci-dry-run-test/
 test-*/
 pr-test-*/
 local-test/
 *-test-game/
+*-test-project/
+test-audit-project/
+test-final-verification/
+my-test-game/
+my-game/
+my-awesome-game/
 
 # OS
 Thumbs.db
@@ -63,6 +78,14 @@ yarn-error.log*
 *.tmp
 *.temp
 .cache/
+*.bak
+*.swp
+*~
+
+# Local CI/testing scripts
+test-ci-locally.ps1
+test-ci-locally.sh
+run-tests-local.*
 
 # Generated documentation artifacts
 docs/_build/
