@@ -20,6 +20,18 @@ import re
 import sys
 from pathlib import Path
 
+# Fix Windows encoding for emoji support
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except AttributeError:
+        # Python < 3.7 fallback
+        import codecs
+
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer, "strict")
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer, "strict")
+
 # Constants
 MAX_PROJECT_NAME_LENGTH = 50
 MIN_PROJECT_NAME_LENGTH = 1
