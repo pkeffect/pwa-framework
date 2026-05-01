@@ -331,7 +331,7 @@ jobs:
           git push origin "v${{ steps.version.outputs.version }}"
       
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: PWA Game Generator v${{ steps.version.outputs.version }}
